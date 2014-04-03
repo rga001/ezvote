@@ -36,7 +36,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 	//poll title
 	if(isset($_POST['poll_title']))
 	{
-		$poll_title = sanitizeString($_POST['poll_title']);
+		$poll_title = filter_var(trim($_POST['poll_title']), FILTER_SANITIZE_STRING);
 		if($poll_title == "")
 		{
 			$error .= "ERROR: Please fill out the title.<br>";
@@ -52,7 +52,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 	//public/private radio buttons
 	if(isset($_POST['is_public']))
 	{
-		$is_public = sanitizeString($_POST['is_public']);
+		$is_public = filter_var($_POST['is_public'], FILTER_SANITIZE_STRING);
 		if($is_public == 'yes')
 		{
 			$is_public = TRUE;
@@ -97,21 +97,29 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 	}
 	
 	//choices
-	foreach($_POST['choices'] as $choice)
+	if(isset($_POST['choices']))
 	{
-		if(sanitizeString($choice) != "")
-			$choices[] = sanitizeString($choice);
+		foreach($_POST['choices'] as $choice)
+		{
+			if(trim($choice) != "")
+				$choices[] = filter_var(trim($choice), FILTER_SANITIZE_STRING);
+		}
+		
+		//check if duplicate choices exist
+		if(sizeof($choices) > sizeof(array_unique($choices)))
+		{
+			$error .= "ERROR: Duplicate choice fields entered.<br>";
+			$has_error = TRUE;
+		}
+		
+		//check that there are at least two choices
+		else if(sizeof($choices) < 2)
+		{
+			$error .= "ERROR: Please submit more than one choice.<br>";
+			$has_error = TRUE;
+		}
 	}
-	
-	//check if duplicate choices exist
-	if(sizeof($choices) > sizeof(array_unique($choices)))
-	{
-		$error .= "ERROR: Duplicate choice fields entered.<br>";
-		$has_error = TRUE;
-	}
-	
-	//check that there are at least two choices
-	else if(sizeof($choices) < 2)
+	else
 	{
 		$error .= "ERROR: Please submit more than one choice.<br>";
 		$has_error = TRUE;
@@ -146,10 +154,26 @@ Title <input type='text' maxlength='30' name='poll_title' value='$poll_title' re
 <table id='Choices'>
 <thead><tr><th>Choices</th></tr></thead>
 <tbody>
-<tr><td><input type='text' maxlenght='30' name='choices[]'></td>
-	<td><input type='button' value='Delete' class='DeleteChoice'></td></tr>
-<tr><td><input type='text' maxlenght='30' name='choices[]'></td>
-	<td><input type='button' value='Delete' class='DeleteChoice'></td></tr>
+_END;
+if(empty($choices) || sizeof($choices) == 1)	//default blank choices field or only one choice
+{
+	if(sizeof($choices) == 1)
+		echo "<tr><td><input type='text' maxlength='30' name='choices[]' value='$choices[0]'></td>";
+	else
+		echo "<tr><td><input type='text' maxlength='30' name='choices[]'></td>";
+	echo     "<td><input type='button' value='Delete' class='DeleteChoice'></td></tr>";
+	echo "<tr><td><input type='text' maxlenght='30' name='choices[]'></td>";
+	echo     "<td><input type='button' value='Delete' class='DeleteChoice'></td></tr>";
+}
+else //choices already has more than one input
+{
+	foreach($choices as $choice)
+	{
+		echo "<tr><td><input type='text' maxlength='30' name='choices[]' value='$choice'></td>";
+		echo     "<td><input type='button' value='Delete' class='DeleteChoice'></td></tr>";
+	}
+}
+echo <<<_END
 </tbody>
 <tfoot><tr><td><input type='button' value='Add Choice' id='AddChoice'></td></tr></tfoot>
 </table>

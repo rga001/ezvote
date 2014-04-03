@@ -1,7 +1,6 @@
 <?php //header.php
 //every file should call this file to start off (fill this with useful things!)
 
-include_once 'functions.php';
 session_start();
 
 echo <<<_END
