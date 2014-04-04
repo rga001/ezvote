@@ -36,7 +36,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 	//poll title
 	if(isset($_POST['poll_title']))
 	{
-		$poll_title = filter_var(trim($_POST['poll_title']), FILTER_SANITIZE_STRING);
+		$poll_title = trim($_POST['poll_title']);
 		if($poll_title == "")
 		{
 			$error .= "ERROR: Please fill out the title.<br>";
@@ -52,7 +52,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 	//public/private radio buttons
 	if(isset($_POST['is_public']))
 	{
-		$is_public = filter_var($_POST['is_public'], FILTER_SANITIZE_STRING);
+		$is_public = $_POST['is_public'];
 		if($is_public == 'yes')
 		{
 			$is_public = TRUE;
@@ -102,7 +102,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 		foreach($_POST['choices'] as $choice)
 		{
 			if(trim($choice) != "")
-				$choices[] = filter_var(trim($choice), FILTER_SANITIZE_STRING);
+				$choices[] = trim($choice);
 		}
 		
 		//check if duplicate choices exist
@@ -178,10 +178,14 @@ echo <<<_END
 <tfoot><tr><td><input type='button' value='Add Choice' id='AddChoice'></td></tr></tfoot>
 </table>
 
-<!-- Submit and end form-->
+<!-- Submit button -->
 <input type='submit' value='Submit'>
-</form>
 
+<!-- Reset button -->
+<input type='reset' value='Reset'>
+
+</form>
+		
 <!-- Cancel Button -->
 <form action='index.php'>
 <input type='submit' value='Cancel'>
