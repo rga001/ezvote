@@ -21,7 +21,7 @@ echo <<<_END
 		<a href="logout.php">Logout</a>
 	</div>
 	<div style="display:table-row">
-		<a href="create.php">Create Poll</a>
+		<a href="create.php">Create Poll</a> <-- not connected to database yet
 	</div>
 	<div style="display:table-row">
 		<a href="MainPage.html">hahahahahahahah</a>

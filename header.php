@@ -4,6 +4,7 @@
 session_start();
 
 include_once 'database.php';
+include_once 'UserModel.php';
 
 echo <<<_END
 <!DOCTYPE html>
@@ -21,6 +22,11 @@ _END;
 
 //set user name for  greeting
 $user = 'Guest';
+//$model = new UserModel();
+//$row = $model->getUserInfo(2);
+//$tstuser = mysql_fetch_row($row);
+
+
 if(isset($_SESSION['user']))
 {
 	$user = $_SESSION['user'];
@@ -31,6 +37,10 @@ else
 
 //Greeting
 echo "Welcome, $user ";
+
+//display user info test
+//echo $tstuser['firstname'] . " " . $tstuser['lastname'];
+
 
 //show menu
 if($loggedin)
