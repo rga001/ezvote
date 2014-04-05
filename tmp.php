@@ -24,7 +24,7 @@ _END;
 		<div style="display:table;width:50%;margin-left:auto; margin-right:auto; border: 2px solid gray; border-radius: 5px;">
 			<div style="display:table-row; background-color: lightblue;">
 				<div style="display:table-cell; padding-top: 1em; padding-left: 1em; font-size:large; ">
-					<a href="/poll/?pollid=<?= $row['poll_id']?>"><?= $row['title']?></a>
+					<a href="/viewpoll.php?pollid=<?= $row['poll_id']?>"><?= $row['title']?></a>
 				</div>
 				<div style="display:table-cell"></div>
 			</div>
