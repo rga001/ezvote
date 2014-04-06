@@ -4,8 +4,13 @@
 include_once 'header.php';
 
 echo <<<_END
-<script>
 
+<!-- jquery datepicker sources -->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/jquery-1.9.1.js"></script>
+<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+		
+<script>
 $(document).ready(function(){
 	
 	//insert row to table
@@ -19,20 +24,29 @@ $(document).ready(function(){
 	$('#Choices').on('click', '.DeleteChoice', function(){
 		$(this).closest('tr').remove();
 	});
+	
+	//calendar datepicker
+	$( "#datepicker" ).datepicker();
 });
-		
 </script>
 _END;
 
 //set variables to empty
-$error = $poll_title = $is_public = $anonymous = $comments_disabled = "";
+$error = $poll_title = $description = $user_id = $is_public = $anonymous = $comments_disabled = $date = $start_date = $end_date = "";
 $public_checked = $private_checked = $anon_checked = $cd_checked = "";
 $has_error = FALSE;
 $choices = array();
 
+//date validation to make sure date is in right format
+function validateDate($date, $format = 'm/d/Y')
+{
+    $d = DateTime::createFromFormat($format, $date);
+    return $d && $d->format($format) == $date;
+}
+
 //form validation
 if($_SERVER['REQUEST_METHOD'] == 'POST')
-{
+{	
 	//poll title
 	if(isset($_POST['poll_title']))
 	{
@@ -49,19 +63,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 		$has_error = TRUE;
 	}
 	
+	//description
+	if(isset($_POST['description']))
+		$description = trim($_POST['description']);
+	
 	//public/private radio buttons
 	if(isset($_POST['is_public']))
 	{
 		$is_public = $_POST['is_public'];
 		if($is_public == 'yes')
 		{
-			$is_public = TRUE;
+			$is_public = 1;	//yes to public
 			$public_checked = 'checked';
 			$private_checked = "";
 		}
 		else if($is_public == 'no')
 		{
-			$is_public = FALSE;
+			$is_public = 0;	//no to public
 			$public_checked = "";
 			$private_checked = 'checked';
 		}
@@ -75,27 +93,57 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 	//anonymous
 	if(isset($_POST['anonymous']))
 	{
-		$anonymous = TRUE;
+		$anonymous = 1;	//yes to anonymous
 		$anon_checked = 'checked';
 	}
 	else
 	{
-		$anonymous = FALSE;
+		$anonymous = 0;	//no to anonymous
 		$anon_checked = "";
 	}
 	
 	//comments_disabled
 	if(isset($_POST['comments_disabled']))
 	{
-		$comments_disabled = TRUE;
+		$comments_disabled = 0;	//comments are disabled
 		$cd_checked = 'checked';
 	}
 	else
 	{
-		$comments_disabled = FALSE;
+		$comments_disabled = 1;	//comments are enabled
 		$cd_checked = "";
 	}
 	
+	//end date
+	if(isset($_POST['date']))
+	{
+		$date = trim($_POST['date']);
+		if(validateDate($date))
+		{
+			$tmp_date = explode("/", $_POST['date']);
+
+			//yyyy-MM-dd HH-mm-ss
+			$end_date = $tmp_date[2].'-'.$tmp_date[0].'-'.$tmp_date[1];
+			$end_date .= ' 23:59:59';
+			
+			if(new DateTime() > new DateTime($end_date))
+			{
+				$error .= "ERROR: Please select a valid date<br>";
+				$has_error = TRUE;
+			}
+		}
+		else
+		{
+			$error .= "ERROR: Please select a valid date<br>";
+			$has_error = TRUE;
+		}
+	}
+	else
+	{
+		$error .= "ERROR: Please select a valid date";
+		$has_error = TRUE;
+	}
+		
 	//choices
 	if(isset($_POST['choices']))
 	{
@@ -104,7 +152,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 			if(trim($choice) != "")
 				$choices[] = trim($choice);
 		}
-		
+
 		//check if duplicate choices exist
 		if(sizeof($choices) > sizeof(array_unique($choices)))
 		{
@@ -126,9 +174,26 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 	}
 	
 	//input into database if there are no errors
-	if($has_error = FALSE)
+	if($has_error == FALSE)
 	{
-		//DATABASE STUFF GOES HERE
+		$user_id = '1';
+		$type = 'multiple choice';
+		$start_date = '1900-01-01 00:00:00';
+		
+		//insert into poll_info table
+		//title, description, creater_id, type, public, comments, anonymous, start_date, end_date, create_date
+		$poll_info = "INSERT into poll_info(title, description, creator_id, type, public, comments, anonymous, start_date, end_date, create_date)".
+					 "(select '$poll_title', '$description', $user_id, type_id, $is_public, $comments_disabled, $anonymous, '$start_date', '$end_date', CONCAT(curdate(), ' ', curtime())".
+					 " from poll_type where type = '$type')";
+		queryMysql($poll_info);
+		
+		//insert choices into poll_choices table
+		$poll_id = mysql_insert_id();
+		for($i = 0; $i < sizeof($choices); $i++)
+		{	
+			$poll_choices = "INSERT INTO poll_choices VALUES($poll_id, '$choices[$i]')";
+			queryMysql($poll_choices);
+		}
 	}
 }
 
@@ -145,11 +210,17 @@ echo <<<_END
 
 <!-- Checkboxes for anonymous and comments -->
 <input type='checkbox' name='anonymous' value='yes' $anon_checked> Anonymous voting<br>
-<input type='checkbox' name='comments_disabled' value='yes' $cd_checked> Comments disabled<br><br>
+<input type='checkbox' name='comments_disabled' value='yes' $cd_checked> Comments disabled<br>
+
+<!--End date -->
+End Date: <input type="text" name='date' id="datepicker" value='$date' required><br><br>
 
 <!-- Title -->
-Title <input type='text' maxlength='30' name='poll_title' value='$poll_title' required>
+Title <input type='text' maxlength='30' name='poll_title' value='$poll_title' required><br>
 
+<!-- Description -->
+Description:<br><textarea name='description' maxlength='300'>$description</textarea>
+		
 <!-- Choices -->
 <table id='Choices'>
 <thead><tr><th>Choices</th></tr></thead>
