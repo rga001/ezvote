@@ -36,7 +36,9 @@ _END;
 	$pollModel = new PollModel();
 	$topPolls = $pollModel->getTopPolls();
 	$count = 0;
-
+?>
+	<div style="width:80%">
+<?php	
 	while ($row = mysql_fetch_array($topPolls)){
 		
 ?>
@@ -68,9 +70,12 @@ _END;
 			</div>
 		</div>
 		<br />
-<?php
-		
+<?php		
 	}
+?>
+	</div>
+<?php
+	
 	echo <<<_END
 		</body></html>
 _END;
