@@ -2,10 +2,10 @@
 //every file should call this file to start off (fill this with useful things!)
 
 session_start();
-
+//model pages have to be included in the file in which they are used WTF!
 include_once 'database.php';
 include_once 'UserModel.php';
-include_once 'PollModel.php';
+
 
 echo <<<_END
 <!DOCTYPE html>
