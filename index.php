@@ -1,5 +1,7 @@
 <?php
 include_once 'header.php';
+include_once('PollModel.php');
+
 echo <<<_END
 
 <div style="background: url(bg.png) no-repeat center center fixed;display:block;position:absolute;width:100%;height:100%;background-size:cover" />
@@ -34,8 +36,6 @@ echo <<<_END
 </body>
 </html>
 _END;
-
-	include_once('PollModel.php');
 	
 	$pollModel = new PollModel();
 	$topPolls = $pollModel->getTopPolls();
@@ -50,16 +50,16 @@ _END;
 			<div style="display:table-row; background-color: lightblue;">
 				<div style="display:table-cell; padding-top: 1em; padding-left: 1em; font-size:large; ">
 <?php
-	if(isset($_SESSION['user'])){
+		if(isset($_SESSION['user'])){
 ?>
 					<a href="/viewpoll.php?pollid=<?= $row['poll_id']?>"><?= $row['title']?></a>
 <?php
-	}
-	else{
+		}
+		else{
 ?>
 					<label><?= $row['title']?></label>
 <?php
-	}
+		}
 ?>
 				</div>
 				<div style="display:table-cell"></div>
