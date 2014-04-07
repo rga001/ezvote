@@ -33,8 +33,6 @@ echo <<<_END
 	</div>
 </div>
 
-</body>
-</html>
 _END;
 	
 	$pollModel = new PollModel();
@@ -43,6 +41,7 @@ _END;
 	echo <<<_END
 		<html><body>
 _END;
+
 	while ($row = mysql_fetch_array($topPolls)){
 		
 ?>
