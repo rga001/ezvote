@@ -5,6 +5,7 @@ session_start();
 
 include_once 'database.php';
 include_once 'UserModel.php';
+include_once 'PollModel.php';
 
 echo <<<_END
 <!DOCTYPE html>

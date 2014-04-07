@@ -1,9 +1,7 @@
 <?php
 include_once 'header.php';
-include_once('PollModel.php');
 
 echo <<<_END
-
 <div style="background: url(bg.png) no-repeat center center fixed;display:block;position:absolute;width:100%;height:100%;background-size:cover" />
 <h1 align="center">Team E: EZvote</h1>
 <h2 align="center">Gage Alvis, Marty Hamilton, Derek Arnold, Katherine Chen</h2>
@@ -38,9 +36,6 @@ _END;
 	$pollModel = new PollModel();
 	$topPolls = $pollModel->getTopPolls();
 	$count = 0;
-	echo <<<_END
-		<html><body>
-_END;
 
 	while ($row = mysql_fetch_array($topPolls)){
 		
@@ -78,4 +73,6 @@ _END;
 	}
 	echo <<<_END
 		</body></html>
+_END;
+
 ?>
