@@ -2,6 +2,9 @@
 //poll creation page
 
 include_once 'header.php';
+include_once 'PollModel.php';
+
+$pollModel = new PollModel();
 
 echo <<<_END
 
@@ -181,19 +184,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 		$start_date = '1900-01-01 00:00:00';
 		
 		//insert into poll_info table
-		//title, description, creater_id, type, public, comments, anonymous, start_date, end_date, create_date
-		$poll_info = "INSERT into poll_info(title, description, creator_id, type, public, comments, anonymous, start_date, end_date, create_date)".
-					 "(select '$poll_title', '$description', $user_id, type_id, $is_public, $comments_disabled, $anonymous, '$start_date', '$end_date', CONCAT(curdate(), ' ', curtime())".
-					 " from poll_type where type = '$type')";
-		queryMysql($poll_info);
+		$pollModel->createPoll($poll_title, $description, $user_id, $type, $is_public, $comments_disabled, $anonymous, $start_date, $end_date);
 		
 		//insert choices into poll_choices table
-		$poll_id = mysql_insert_id();
-		for($i = 0; $i < sizeof($choices); $i++)
-		{	
-			$poll_choices = "INSERT INTO poll_choices VALUES($poll_id, '$choices[$i]')";
-			queryMysql($poll_choices);
-		}
+		$pollModel->insertChoices($choices);
+		
+		die('<meta http-equiv="REFRESH" content="0; url=index.php">');
 	}
 }
 

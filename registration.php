@@ -2,6 +2,8 @@
 //register for the website
 
 include_once 'header.php';
+include_once 'UserModel.php';
+$userModel = new userModel();
 
 $error = $email = $firstname = $lastname = $username = $password = $password2 = "";
 $has_error = FALSE;
@@ -14,9 +16,9 @@ if(isset($_SESSION['user']))
 if($_SERVER['REQUEST_METHOD'] == 'POST')
 {
 	//user input
-	$email = trim($_POST['email']);
-	$firstname = trim($_POST['firstname']);
-	$lastname = trim($_POST['lastname']);
+	$email = strtolower(trim($_POST['email']));
+	$firstname = ucfirst(trim($_POST['firstname']));
+	$lastname = ucfirst(trim($_POST['lastname']));
 	$username = trim($_POST['username']);
 	$password = $_POST['password'];
 	$password2 = $_POST['password2'];
@@ -60,8 +62,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 	//register user to database
 	if($has_error == FALSE)
 	{
-		//$password = crypt($password, 'h3!1o');
-		queryMysql("INSERT INTO users VALUES('$email', '$firstname', '$lastname', '$username', '$password')");
+		$userModel->registerUser($email, $firstname, $lastname, $username, $password);
 		
 		//store info to keep user logged in
 		$_SESSION['user'] = $firstname." ".$lastname;

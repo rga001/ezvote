@@ -9,6 +9,13 @@ class UserModel{
 		return queryMysql($query);
 	}
 	//return user poll information (past poll info) 
+	
+	//register user to database
+	public function registerUser($email, $firstname, $lastname, $username, $password)
+	{
+		$query = "INSERT INTO users VALUES(NULL, '$email', '$firstname', '$lastname', '$username', '$password')";
+		queryMysql($query);
+	}
 }
 
 ?>
