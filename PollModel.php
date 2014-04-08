@@ -36,11 +36,12 @@ class PollModel{
 	public function insertChoices($choices)
 	{
 		$poll_id = mysql_insert_id();
-		for($i = 0; $i < sizeof($choices); $i++)
+		$query = "INSERT INTO poll_choices VALUES($poll_id, '$choices[0]')";
+		for($i = 1; $i < sizeof($choices); $i++)
 		{
-			$query = "INSERT INTO poll_choices VALUES($poll_id, '$choices[$i]')";
-			queryMysql($query);
+			$query .= ",($poll_id, '$choices[$i]')";
 		}
+		queryMysql($query);
 	}
 }
 
