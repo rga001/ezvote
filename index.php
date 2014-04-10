@@ -5,12 +5,14 @@ include_once 'UserModel.php';
 ?>
 <script type="text/javascript">
 	$(document).ready(function(){
+		$('.extraInfo').css('height', $('.extraInfo').height());
+		$('.extraInfo').hide();
 		$('.expand').click(function(){
 			var id = $(this).attr("id");
 			if ($("#poll"+id).is(':visible')){
-				$("#poll"+id).hide();
+				$("#poll"+id).slideUp();
 			}else{
-				$("#poll"+id).show();
+				$("#poll"+id).slideDown();
 			}
 		});
 	});
@@ -41,16 +43,15 @@ _END;
 				</div>
 				<div style="display:table-cell"></div>
 			</div>
-			<div style="display:table-row">
-				<div style="display:table-cell; padding-left: 1em; padding-top: 1em;width:50%;border-bottom:1px solid gray;">
-					<label style="border-left: 2px solid lightgray;"><?= $row['description']?></label>
+			<div style="cursor:pointer;height:100%;width:100%;float:left;padding-left:1em;padding-top:1em;" id="<?= $row['poll_id']?>" class="expand">
+				<div style="float:left;width:50%;">
+					<label style="cursor:pointer;border-left: 2px solid lightgray;"><?= $row['description']?></label>
 				</div>
-				<div style="display:table-cell;width:50%;border-bottom:1px solid gray;">
-					<label>Poll closes at: <?= $row['end_date'] ?></label>
-					<a class="expand" id="<?=$row['poll_id'] ?>" href="javascript:void(0)" style="float:right; font-size:x-small;">>></a>
+				<div style="float:left;width:50%;">
+					<label style="cursor:pointer;">Poll closes at: <?= $row['end_date'] ?></label>
 				</div>
 			</div>
-			<div id="poll<?=$row['poll_id'] ?>" style="display:none; padding-left:1em;">
+			<div id="poll<?=$row['poll_id'] ?>" style="display:none;width:200px" class="extraInfo">
 				<label>Creator: <?=$tmpCreator['firstname'].' '.$tmpCreator['lastname'] ?></label>
 			</div>
 		</div>
@@ -65,3 +66,6 @@ _END;
 _END;
 
 ?>
+
+
+
