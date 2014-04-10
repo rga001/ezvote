@@ -1,75 +1,53 @@
 <?php //login.php
 //login to EzVote here
 
-include_once 'header.php';
+$userModel = new userModel();
+$error = $username = $password = "";
+$loggedIn = false;
 
-$error = $email = $password = "";
-
-//if logged in, redirect to index.php
-if(isset($_SESSION['user']))
-	die('<meta http-equiv="REFRESH" content="0; url=index.php">');
-
-//log in user
+//log in user validation
 if($_SERVER['REQUEST_METHOD'] == 'POST')
 {
-	$email = $_POST['email'];
+	$username = $_POST['username'];
 	$password = $_POST['password'];
 	
 	//check if any fields are empty
-	if ($email == "" || $password == "")
+	if ($username == "" || $password == "")
 		$error = "ERROR: Username/Password invalid<br>";
 	
 	else 
 	{
 		//check to see if login info matches a user
-		//$password = crypt($password, 'h3!1o');
-		$query = "SELECT email,password FROM users WHERE email='$email' AND password='$password'";
-		
-		//username invalid
-		if (mysql_num_rows(queryMysql($query)) == 0)
+		$loggedIn = $userModel->checkUserInfo($username, $password);
+
+		//username/password invalid
+		if($loggedIn == false)
 			$error = "ERROR: Username/Password invalid<br>";
 		
-		//username valid
+		//username/password valid so log user in with sessions (userid, username, name)
 		else
-		{
-			//retrive first and last name
-			$query_names = "SELECT firstname,lastname,username FROM users WHERE email='$email'";
-			$row = mysql_fetch_row(queryMysql($query_names));
-			$name = $row[0]." ".$row[1];
-			$username = $row[2];
-				
-			//store info to keep user logged in
-			$_SESSION['user'] = $name;
-			$_SESSION['username'] = $username;
-				
-			//continue to home page
-			die('<meta http-equiv="REFRESH" content="0; url=index.php">');
-		}
+			$userModel->loginUser($username, $password);			
 	}
 }
 
-//log in form
-echo <<<_END
-<h1>Login</h1> $error
-
-<form method='post' action='login.php'>
-<table>
-	<tbody>
-		<tr><td>Email</td><td><input type='email' maxlength='254' name='email' value='$email'></td></tr>
-		<tr><td>Password</td><td><input type='password' maxlength='16' name='password'></td></tr>
-	</tbody>
-	<tfoot>
-		<tr><td><input type='submit' value='Log In'></td></tr>
-	</tfoot>
-</table>
-</form>
-			
-<form action='registration.php'>
-<input type='submit' value='Create New Account' />
-</form>
-
-</body>
-</html>
+//only show login form when not logged in
+if(!isset($_SESSION['userid']))
+{
+	echo <<<_END
+		<form method='post' action='login.php'>
+		<table id='login'>
+			<tbody>
+				<tr><td>Username</td><td>Password</td></tr>
+				<td><input type='text' maxlength='254' name='username' value='$username'></td>
+				<td><input type='password' maxlength='16' name='password'></td>
+				<td><input type='submit' value='Log In'></td></tr>
+			</tbody>
+			<tfoot>
+				<tr><td colspan=2>$error</td></tr>
+			</tfoot>
+		</table>
+		</form>
+		</div>
 _END;
-
+}
 ?>

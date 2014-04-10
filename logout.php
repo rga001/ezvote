@@ -1,8 +1,7 @@
 <?php //logout.php
 include_once 'header.php';
 
-//log out
-if (isset($_SESSION['user']))
+if (isset($_SESSION['userid']))
 {
     $_SESSION=array();
 
@@ -15,4 +14,3 @@ if (isset($_SESSION['user']))
 //redirect to home page
 echo '<meta http-equiv="REFRESH" content="0; url=index.php">';
 ?>
-</body></html>
