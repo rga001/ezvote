@@ -11,7 +11,7 @@ class PollModel{
 	
 	//return return poll info by id
 	public function getPollInfo($pollid){	
-		$query = "CALL extreme_voting.GetPollInfo('$pollid')";
+		$query = "SELECT * FROM poll_info WHERE poll_id = $pollid"; //"CALL extreme_voting.GetPollInfo('$pollid')";
 		return queryMysql($query);
 	}
 	
@@ -20,6 +20,30 @@ class PollModel{
 	{
 		$query = "SELECT * FROM poll_choices WHERE poll_id = 44";
 		return queryMysql($query);
+	}
+	
+	//vote on poll
+	public function votePoll($poll_id, $user_id, $answer)
+	{
+		$query = "INSERT into poll_vote VALUES($poll_id, $user_id, '$answer')";
+		queryMysql($query);
+	}
+	
+	//shows if user has already voted on poll
+	public function votedAlready($poll_id, $user_id)
+	{
+		$query = "SELECT * FROM poll_vote WHERE poll_id=$poll_id AND user_id=$user_id";
+		if (mysql_num_rows(queryMysql($query)) == 0)
+			return false;
+		else
+			return true;
+	}
+	
+	//retrieves number of votes on a certain choice for a poll
+	public function voteTally($poll_id, $choice)
+	{
+		$query = "SELECT * FROM poll_vote WHERE poll_id=$poll_id AND answer='$choice'";
+		return mysql_num_rows(queryMysql($query));
 	}
 	
 	//create poll and insert into the database
@@ -32,15 +56,22 @@ class PollModel{
 		queryMysql($query);
 	}
 	
-	//insert multiple choices to the database
+	//insert multiple choices after poll creation to the database
 	public function insertChoices($choices)
 	{
 		$poll_id = mysql_insert_id();
-		$query = "INSERT INTO poll_choices VALUES($poll_id, '$choices[0]')";
-		for($i = 1; $i < sizeof($choices); $i++)
+		for($i = 0; $i < sizeof($choices); $i++)
 		{
-			$query .= ",($poll_id, '$choices[$i]')";
+			$query = "INSERT INTO poll_choices VALUES($poll_id, '$choices[$i]')";
+			queryMysql($query);
 		}
+		return $poll_id;
+	}
+	
+	//insert poll_id into group_poll
+	public function insertGroupPoll($poll_id, $group_chosen)
+	{
+		$query = "INSERT INTO group_polls (group_id, poll_id) select group_id, $poll_id from groups where name = '$group_chosen'";
 		queryMysql($query);
 	}
 }

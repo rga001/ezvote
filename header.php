@@ -5,64 +5,54 @@ session_start();
 
 include_once 'database.php';
 include_once 'UserModel.php';
+include_once 'PollModel.php';
+
+$userModel = new UserModel();
 
 echo <<<_END
 <!DOCTYPE html>
 <html>
 <head>
 <title>$appname</title>
-		
-	<div id="image" style="background: url(Banner.jpg) no-repeat center center fixed;height:196px;background-size:cover" />
-	<!-- include jquery and css stylesheet-->
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-	<link rel='stylesheet' href='mystyle.css' type='text/css' />
+
+<!--<div id="image" style="background: url(Banner.jpg) no-repeat center center fixed; height:196px; background-size:cover" />-->
+
+<!-- include jquery and css stylesheet-->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<link rel='stylesheet' href='mystyle.css' type='text/css' />
 
 </head>
 <body>
 _END;
 
-//set user name for  greeting
-$user = 'Guest';
-//$model = new UserModel();
-//$row = $model->getUserInfo(2);
-//$tstuser = mysql_fetch_row($row);
-
-
-if(isset($_SESSION['user']))
+//menu if user is logged in
+if($userModel->userIsLoggedIn())
 {
-	$user = $_SESSION['user'];
-	$loggedin = TRUE;
+	$name = $_SESSION['name'];
+	
+	echo <<<_END
+	<div id='guest'>Welcome, $name</div>
+	<div id='links'>
+	<a class='linky' href='index.php'>Home </a>
+	<a class='linky' href='create.php'>Create Poll</a>
+	<a class='linky' href='logout.php'>Log Out</a>
+	</div>
+_END;
 }
-else
-	$loggedin = FALSE;
-
-echo "<div id ='guest'>
-		Welcome, $user &nbsp
-	  </div>";
-
-if($loggedin)
-{
-	echo "<div id='loggdin'>
-			<a href='index.php'>Home </a>
-			<a href='create.php'>Create Poll</a>
-			<a href='logout.php'>Log Out</a>
-		  </div>";
-}
-
+//menu if user is not logged in
 else
 {
-	echo "
-		<div id='links'>
-		
-		&nbsp<a href='index.php'>Home</a>&nbsp
-		&nbsp<a href='login.php'>Log In</a>&nbsp
-		&nbsp<a href='registration.php'>Register</a>&nbsp
-
-		</div>
-	";
+	echo <<<_END
+	<div id='guest'>Welcome, Guest</div>
+	<div id='links'>
+	&nbsp<a class='linky' href='index.php'>Home</a>
+	<a class='linky' href='registration.php'>Register</a>
+	</div>
+_END;
 }
-echo "<div id='banner'><br>";
 
 include_once 'login.php';
+echo "<div id='banner'>";
+echo "</div>";
 ?>
 

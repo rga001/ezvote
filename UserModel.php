@@ -35,8 +35,24 @@ class UserModel{
 		$row = mysql_fetch_array(queryMysql($query));
 		
 		$_SESSION['userid'] = $row['userid'];
-		$_SESSION['username'] = $row['username'];
-		$_SESSION['name'] = $row['firstname']." ".$row['lastname'];
+		$_SESSION['username'] = htmlspecialchars($row['username']);
+		$_SESSION['name'] = htmlspecialchars($row['firstname']." ".$row['lastname']);
+	}
+	
+	//check if user is logged in
+	public function userIsLoggedIn()
+	{
+		if(isset($_SESSION['userid']))
+			return true;
+		else
+			return false;
+	}
+	
+	//return groups that user is in
+	public function userGroups($userid)
+	{
+		$query = "select groups.name from groups, group_members where groups.group_id = group_members.group_id AND group_members.member_id = $userid";
+		return queryMysql($query);
 	}
 }
 

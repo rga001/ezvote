@@ -2,7 +2,7 @@
 
 	include_once 'header.php';
 	
-/**/	$error = $groupname = $password = $password2 = "";
+	$error = $groupname = $password = $password2 = "";
 	$has_error = FALSE;
 	
 	//validate form
@@ -25,9 +25,9 @@
 			$error .= "ERROR: Passwords do not match.<br>";
 			$has_error = TRUE;
 		}
-		elseif($has_error == FALSE) //insert values into table
+		else//if($has_error == FALSE) //insert values into table
 		{
-			queryMysql("INSERT INTO groups VALUES('$gname', '$gpass', '$creator', '$creation_date')");
+			queryMysql("INSERT INTO groups (name, password, creator_id, created_date) VALUES('$gname', '$gpass', '$creator', '$creation_date')");
 		}
 	}
 
@@ -35,14 +35,14 @@
 
 
 echo <<<_END
-<h1>Registration</h1>$error
+<h1>Create Group</h1>$error
 
-<form method='post' action='registration.php'>
+<form method='post' action='create_grp.php'>
 <table>
-	<tbody>
+	<tbody> 
 		<tr><td>Group Name</td><td><input type='gn' maxlength='254' name='gn' value='$gn'></td></tr>
-		<tr><td>Group password</td><td><input type='gpassword' maxlength='16' name='gpassword'></td></tr>
-		<tr><td>Confirm group password</td><td><input type='gpassword' maxlength='16' name='gpassword2'></td></tr>
+		<tr><td>Group password</td><td><input type='password' maxlength='16' name='gpassword'></td></tr>
+		<tr><td>Confirm group password</td><td><input type='password' maxlength='16' name='gpassword2'></td></tr>
 	</tbody>
 	<tfoot>
 		<tr><td><input type='submit' value='Create Group'></td></tr>

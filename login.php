@@ -1,15 +1,15 @@
 <?php //login.php
 //login to EzVote here
 
-$userModel = new userModel();
+$userModel = new UserModel();
 $error = $username = $password = "";
 $loggedIn = false;
 
 //log in user validation
-if($_SERVER['REQUEST_METHOD'] == 'POST')
+if($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['username1']) || isset($_POST['password1'])))
 {
-	$username = $_POST['username'];
-	$password = $_POST['password'];
+	$username = $_POST['username1'];
+	$password = $_POST['password1'];
 	
 	//check if any fields are empty
 	if ($username == "" || $password == "")
@@ -26,28 +26,30 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 		
 		//username/password valid so log user in with sessions (userid, username, name)
 		else
-			$userModel->loginUser($username, $password);			
+		{
+			$userModel->loginUser($username, $password);
+			die('<meta http-equiv="REFRESH" content="0; url=index.php">');
+		}			
 	}
 }
 
 //only show login form when not logged in
-if(!isset($_SESSION['userid']))
+if(!($userModel->userIsLoggedIn()))
 {
 	echo <<<_END
-		<form method='post' action='login.php'>
+		<form method='post' action="">
 		<table id='login'>
 			<tbody>
 				<tr><td>Username</td><td>Password</td></tr>
-				<td><input type='text' maxlength='254' name='username' value='$username'></td>
-				<td><input type='password' maxlength='16' name='password'></td>
+				<td><input type='text' maxlength='254' name='username1' value='$username' required></td>
+				<td><input type='password' maxlength='16' name='password1' required></td>
 				<td><input type='submit' value='Log In'></td></tr>
 			</tbody>
 			<tfoot>
-				<tr><td colspan=2>$error</td></tr>
+				<tr><td colspan=2><span class='error'>$error</span></td></tr>
 			</tfoot>
 		</table>
 		</form>
-		</div>
 _END;
 }
 ?>

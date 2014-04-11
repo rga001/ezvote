@@ -11,14 +11,11 @@ echo <<<_END
 <html>
 <head>
 <title>$appname</title>
-
-<style> 
-</style>
 		
-<div id="image" style="background: url(Banner.jpg) no-repeat center center fixed;height:196px;background-size:cover" />		
-<!-- include jquery and css stylesheet-->
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<link rel='stylesheet' href='mystyle.css' type='text/css' />
+	<div id="image" style="background: url(Banner.jpg) no-repeat center center fixed;height:196px;background-size:cover" />
+	<!-- include jquery and css stylesheet-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<link rel='stylesheet' href='mystyle.css' type='text/css' />
 
 </head>
 <body>
@@ -51,6 +48,7 @@ if($loggedin)
 			<a href='logout.php'>Log Out</a>
 		  </div>";
 }
+
 else
 {
 	echo "
@@ -61,11 +59,10 @@ else
 		&nbsp<a href='registration.php'>Register</a>&nbsp
 
 		</div>
-
-		</body>
-		</html>
 	";
 }
+echo "<div id='banner'><br>";
 
+include_once 'login.php';
 ?>
 

@@ -2,9 +2,10 @@
 //poll creation page
 
 include_once 'header.php';
-include_once 'PollModel.php';
 
 $pollModel = new PollModel();
+$userModel = new UserModel();
+$user_id = $_SESSION['userid'];
 
 echo <<<_END
 
@@ -30,13 +31,23 @@ $(document).ready(function(){
 	
 	//calendar datepicker
 	$( "#datepicker" ).datepicker();
+	
+	//disable groups menu
+	$('#private').click(function(){
+		$('#groups').attr("disabled", false);
+  	});
+	$('#public').click(function(){
+		$('#groups').attr("disabled", true);
+	});
+		
 });
 </script>
 _END;
 
 //set variables to empty
-$error = $poll_title = $description = $user_id = $is_public = $anonymous = $comments_disabled = $date = $start_date = $end_date = "";
+$error = $poll_title = $description = $is_public = $group_chosen = $anonymous = $comments_disabled = $date = $start_date = $end_date = "";
 $public_checked = $private_checked = $anon_checked = $cd_checked = "";
+$disabled = 'disabled';
 $has_error = FALSE;
 $choices = array();
 
@@ -85,7 +96,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 			$is_public = 0;	//no to public
 			$public_checked = "";
 			$private_checked = 'checked';
-		}
+			
+			if(isset($_POST['groups']))
+			{
+				$group_chosen = $_POST['groups'];
+				$disabled = "";
+			}
+			else 
+			{
+				$error .= "ERROR: You are not in any groups to make a private poll.<br>";
+				$has_error = true;
+			}
+		}	
 	}
 	else 
 	{
@@ -131,19 +153,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 			
 			if(new DateTime() > new DateTime($end_date))
 			{
-				$error .= "ERROR: Please select a valid date<br>";
+				$error .= "ERROR: Please select a valid date.<br>";
 				$has_error = TRUE;
 			}
 		}
 		else
 		{
-			$error .= "ERROR: Please select a valid date<br>";
+			$error .= "ERROR: Please select a valid date.<br>";
 			$has_error = TRUE;
 		}
 	}
 	else
 	{
-		$error .= "ERROR: Please select a valid date";
+		$error .= "ERROR: Please select a valid date.<br>";
 		$has_error = TRUE;
 	}
 		
@@ -179,7 +201,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 	//input into database if there are no errors
 	if($has_error == FALSE)
 	{
-		$user_id = '1';
+		echo $error;
 		$type = 'multiple choice';
 		$start_date = '1900-01-01 00:00:00';
 		
@@ -187,12 +209,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 		$pollModel->createPoll($poll_title, $description, $user_id, $type, $is_public, $comments_disabled, $anonymous, $start_date, $end_date);
 		
 		//insert choices into poll_choices table
-		$pollModel->insertChoices($choices);
+		$poll_id = $pollModel->insertChoices($choices);
+		
+		//if private insert poll id into group_polls
+		if($is_public == 0)
+			$pollModel->insertGroupPoll($poll_id, $group_chosen);
 		
 		die('<meta http-equiv="REFRESH" content="0; url=index.php">');
 	}
 }
-
 echo <<<_END
 <body onload="numRows('3')">
 <h1>Create Poll</h1>$error
@@ -201,11 +226,23 @@ echo <<<_END
 <form method='post' action='create.php'>
 
 <!-- Public/Private radio buttons -->
-<input type='radio' name='is_public' value='yes' $public_checked required>Public
-<input type='radio' name='is_public' value='no' $private_checked>Private<br>
+<input type='radio' id='public' name='is_public' value='yes' $public_checked required>Public
+<input type='radio' id='private' name='is_public' value='no' $private_checked>Private
+
+<!-- Select group if private -->
+<select name='groups' id='groups' $disabled>
+_END;
+$groups = $userModel->userGroups($user_id);
+while($groups_row = mysql_fetch_array($groups))
+{
+	$group = $groups_row['name'];
+	echo "<option value='$group'>$group</option>";
+}
+echo <<<_END
+</select>
 
 <!-- Checkboxes for anonymous and comments -->
-<input type='checkbox' name='anonymous' value='yes' $anon_checked> Anonymous voting<br>
+<br><input type='checkbox' name='anonymous' value='yes' $anon_checked> Anonymous voting<br>
 <input type='checkbox' name='comments_disabled' value='yes' $cd_checked> Comments disabled<br>
 
 <!--End date -->
