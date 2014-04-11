@@ -1,9 +1,6 @@
 <?php
 /*
  * need to do:
- * can't vote after end date
- * see who voted for who unless anonymous
- * implement public/private
  * add comments unless comments disabled
  * change vote after voting
  */
@@ -18,6 +15,12 @@ $poll = mysql_fetch_array($poll_info);
 
 $userModel = new UserModel();
 $user_id = $_SESSION['userid'];
+
+if(!($userModel->userPermissionPoll($poll_id, $user_id)))
+{
+	echo "you do not have permission to view this model";
+	die('<meta http-equiv="REFRESH" content="0; url=index.php">');
+}
 
 //set variables
 $error = $vote = "";
@@ -44,7 +47,8 @@ if($poll['description'] != "")
 echo "<span class='error'>$error</span>";
 
 //view results if already voted or if not logged in
-if(!($userModel->userIsLoggedIn()) || $pollModel->votedAlready($poll_id, $user_id))
+if(!($userModel->userIsLoggedIn()) || $pollModel->votedAlready($poll_id, $user_id)
+|| !($pollModel->validPollDate($poll_id)))
 {
 	echo "<table><tbody>";
 	echo "<tr><td>Choices</td><td>Votes</td></tr>";
@@ -52,8 +56,14 @@ if(!($userModel->userIsLoggedIn()) || $pollModel->votedAlready($poll_id, $user_i
 	{
 		$choice = $choice_row['choice'];
 		$tally = $pollModel->voteTally($poll_id, $choice);
+		if($poll['anonymous'] == 0 && $poll['public'] == 0)	//if not anonymous and private give real name
+			$voters = $pollModel->choiceVotersNames($poll_id, $choice);
+		else if($poll['anonymous'] == 0 && $poll['public'] == 1)	//if not anonymous and private give username
+			$voters = $pollModel->choiceVotersUsernames($poll_id, $choice);
+		else //if anonymous
+			$voters = "";
 		$choice = htmlspecialchars($choice);
-		echo "<tr><td>$choice</td><td>$tally</td></tr>";
+		echo "<tr title='$voters'><td>$choice</td><td>$tally</td></tr>";
 	}
 	echo "</tbody>";
 	echo "</table>";
@@ -72,3 +82,8 @@ else
 	echo "<tr><td><input type='submit' value='Vote'></td></tr>";
 	echo "</table></form>";
 }
+
+if($poll['comments'] == 0)
+	echo "Comments are disabled for this poll.";
+else 
+	echo "Comments are not disabled for this poll.";

@@ -18,7 +18,7 @@ class PollModel{
 	//return poll choices by id
 	public function getPollChoices($pollid)
 	{
-		$query = "SELECT * FROM poll_choices WHERE poll_id = 44";
+		$query = "SELECT * FROM poll_choices WHERE poll_id = $pollid";
 		return queryMysql($query);
 	}
 	
@@ -73,6 +73,57 @@ class PollModel{
 	{
 		$query = "INSERT INTO group_polls (group_id, poll_id) select group_id, $poll_id from groups where name = '$group_chosen'";
 		queryMysql($query);
+	}
+	
+	//find out if poll date has ended yet
+	public function validPollDate($poll_id)
+	{
+		$query = "SELECT start_date, end_date FROM poll_info WHERE poll_id = $poll_id";
+		$poll = mysql_fetch_array(queryMysql($query));
+		if(new DateTime() > new DateTime($end_date))
+			return false;
+		else
+			return true;
+	}
+	
+	//return everyone's real name that voted a certain choice on a poll
+	public function choiceVotersNames($poll_id, $choice)
+	{
+		$voter_names = "";
+		$query = "SELECT users.firstname, users.lastname FROM poll_vote, users ". 
+		"WHERE users.userid = poll_vote.user_id AND poll_vote.poll_id = $poll_id AND poll_vote.answer = '$choice'";
+		$voter_info = queryMysql($query);
+		
+		//grab names
+		while($voters = mysql_fetch_array($voter_info))
+			$voter_names .= $voters['firstname'] . " " . $voters['lastname'] . ", ";
+		$voter_names = substr($voter_names, 0, -2);
+		
+		//if there are no votes for a choice
+		if($voter_names == "")
+			$voter_names = "No votes yet";
+		
+		return $voter_names;
+	}
+	
+	//return everyone's username that voted a certain choice on a poll
+	public function choiceVotersUsernames($poll_id, $choice)
+	{
+		$voter_names = "";
+		$query = "SELECT users.username FROM poll_vote, users ".
+				"WHERE users.userid = poll_vote.user_id AND poll_vote.poll_id = $poll_id AND poll_vote.answer = '$choice'";
+		$voter_info = queryMysql($query);
+
+		//grab names
+		while($voters = mysql_fetch_array($voter_info))
+			$voter_names .= $voters['username'] . ", ";
+		$voter_names = substr($voter_names, 0, -2);
+
+		//if there are no votes for a choice
+		if($voter_names == "")
+			$voter_names = "No votes yet";
+
+		return $voter_names;
 	}
 }
 

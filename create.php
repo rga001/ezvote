@@ -105,7 +105,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 			else 
 			{
 				$error .= "ERROR: You are not in any groups to make a private poll.<br>";
-				$has_error = true;
+				$has_error = TRUE;
 			}
 		}	
 	}

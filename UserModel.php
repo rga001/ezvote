@@ -54,6 +54,26 @@ class UserModel{
 		$query = "select groups.name from groups, group_members where groups.group_id = group_members.group_id AND group_members.member_id = $userid";
 		return queryMysql($query);
 	}
+	
+	//find out if user is allowed to see poll
+	public function userPermissionPoll($poll_id, $user_id)
+	{
+		//check if poll is public poll
+		$query = "SELECT public FROM poll_info WHERE poll_id = $poll_id";
+		$poll_info = mysql_fetch_array(queryMysql($query));
+		if($poll_info['public'] == 1)	//return true if public
+			return true;
+	
+	
+		//check if user is a member of the group the poll is in
+		$query = "SELECT * FROM group_members, group_polls WHERE group_polls.poll_id = $poll_id " .
+		"AND group_members.group_id = group_polls.group_id AND group_members.member_id = $user_id";
+
+		if(mysql_num_rows(queryMysql($query)) == 0)
+			return false;
+		else
+			return true;		
+	}
 }
 
 ?>
