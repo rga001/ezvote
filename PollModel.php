@@ -4,8 +4,25 @@ include_once("database.php");
 
 class PollModel{
 	//return poll id's sorted by popularity or something
-	public function getTopPolls(){
-		$query = 'SELECT * FROM extreme_voting.poll_info WHERE DATE(end_date) >= CURDATE() ORDER BY end_date ASC LIMIT 10';
+	public function getTopPolls($user_id, $sort_by, $page, $asc){
+		switch ($sort_by){
+			case 'start':
+				$orderby = ' ORDER BY start_date ';
+			case 'end':
+				$orderby = ' ORDER BY end_date ';
+			case 'created':
+				$orderby = ' ORDER BY created_date ';
+			case 'pop':
+				$orderby = ' ORDER BY votes ';
+			default:
+				$orderby = ' ORDER BY (CASE WHEN date(end_date) <= NOW() THEN 1 ELSE 0 END) DESC, end_date ';
+		}
+		if ($asc == 'true')
+			$orderby .= ' ASC';
+		else
+			$orderby .= ' DESC';
+		$query = 'SELECT p.poll_id, COUNT(DISTINCT(v.user_id)) FROM extreme_voting.poll_info p LEFT OUTER JOIN extreme_voting.poll_votes v ON v.poll_id = p.poll_id WHERE (p.public = 1 OR p.creator_id = $user_id) ';
+		$query .= $orderby;
 		return queryMysql($query);
 	}
 	

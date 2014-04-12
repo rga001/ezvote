@@ -2,6 +2,22 @@
 include_once 'header.php';
 include_once 'PollModel.php';
 include_once 'UserModel.php';
+
+//get key function
+function GET($key, $default) {
+    return (isset($_GET[$key]) && !empty($_GET[$key])) ? $_GET[$key] : $default;
+}
+//get user id if logged in
+if (isset($_SESSION['user_id']))
+	$user_id = $_SESSION['user_id'];
+else
+	$user_id = -1;
+
+$page = GET('page', 1);
+$sortby = GET('sortby', 'null');
+$asc = GET('asc', 'true');	
+echo $sortby . $page . $asc;
+
 ?>
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -27,10 +43,36 @@ _END;
 	
 	$pollModel = new PollModel();
 	$userModel = new UserModel();
-	$topPolls = $pollModel->getTopPolls();
+	$topPolls = $pollModel->getTopPolls($user_id, $sort_by, $page, $asc);
 	$count = 0;
+	
+	function sortPic($check){
+		global $sortby, $asc;
+		$link = '';
+		if ($sortby == $check)
+			if ($asc == 'true')
+				$link = '<img src="asc.jpg" alt="asc">';
+			else
+				$link = '<img src="desc.jpg" alt="desc">';
+		return $link;
+	}
+	function ascCheck($check){
+		global $sortby, $asc;
+		$result = 'true';
+		if ($sortby == $check && $asc == 'true')
+			$result = 'false';
+		return $result;
+	}
+	
 ?>
 	<div style="width:80%; background: white;margin-left: auto; margin-right: auto;">
+		<div style="padding-bottom:1em;">
+			<label>Sort by: </label>
+			<a href="/index.php?sortby=start&asc=<?=ascCheck('start')?>" style="padding-left:1em;">Poll Open</a><?=sortPic('start')?>
+			<a href="/index.php?sortby=end&asc=<?=ascCheck('end')?>" style="padding-left:1em;">Poll Close</a><?=sortPic('end')?>
+			<a href="/index.php?sortby=create&asc=<?=ascCheck('create')?>" style="padding-left:1em;">Created Date</a><?=sortPic('create')?>
+			<a href="/index.php?sortby=pop&asc=<?=ascCheck('pop')?>" style="padding-left:1em;">Popular Polls</a><?=sortPic('pop')?>
+		</div>
 <?php	
 	while ($row = mysql_fetch_array($topPolls)){
 		$tmpRow = $userModel->getUserInfo($row['creator_id']);
@@ -57,6 +99,7 @@ _END;
 		</div>
 		<br />
 <?php	}	?>
+
 	</div>
 	
 	
