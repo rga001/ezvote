@@ -16,7 +16,7 @@ else
 $page = GET('page', 1);
 $sortby = GET('sortby', 'null');
 $asc = GET('asc', 'true');	
-echo $sortby . $page . $asc;
+//echo $sortby . $page . $asc;
 
 ?>
 <script type="text/javascript">
