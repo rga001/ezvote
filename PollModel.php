@@ -4,25 +4,27 @@ include_once("database.php");
 
 class PollModel{
 	//return poll id's sorted by popularity or something
-	public function getTopPolls($user_id, $sort_by, $page, $asc){
-		switch ($sort_by){
+	public function getTopPolls($user_id, $sortby, $page, $asc){
+		switch ($sortby){
 			case 'start':
-				$orderby = ' ORDER BY start_date ';
+				$orderby = " ORDER BY start_date "; break;
 			case 'end':
-				$orderby = ' ORDER BY end_date ';
+				$orderby = " ORDER BY end_date "; break;
 			case 'created':
-				$orderby = ' ORDER BY created_date ';
+				$orderby = " ORDER BY created_date "; break;
 			case 'pop':
-				$orderby = ' ORDER BY votes ';
+				$orderby = " ORDER BY votes "; break;
 			default:
-				$orderby = ' ORDER BY (CASE WHEN date(end_date) <= NOW() THEN 1 ELSE 0 END) DESC, end_date ';
+				$orderby = " ORDER BY (CASE WHEN date(end_date) <= NOW() THEN 1 ELSE 0 END) DESC, end_date "; break;
 		}
 		if ($asc == 'true')
 			$orderby .= ' ASC';
 		else
 			$orderby .= ' DESC';
-		$query = 'SELECT p.poll_id, COUNT(DISTINCT(v.user_id)) FROM extreme_voting.poll_info p LEFT OUTER JOIN extreme_voting.poll_votes v ON v.poll_id = p.poll_id WHERE (p.public = 1 OR p.creator_id = $user_id) ';
+		$limit = ($page - 1) * 10;
+		$query = "SELECT p.*, COUNT(DISTINCT(v.user_id)) FROM extreme_voting.poll_info p LEFT OUTER JOIN extreme_voting.poll_vote v ON v.poll_id = p.poll_id WHERE (p.public = 1 OR p.creator_id = $user_id) GROUP BY p.poll_id";
 		$query .= $orderby;
+		$query .= " LIMIT $limit, 10";
 		return queryMysql($query);
 	}
 	

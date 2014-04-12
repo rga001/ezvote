@@ -40,10 +40,10 @@ echo <<<_END
 <h2 align="center">Gage Alvis, Marty Hamilton, Derek Arnold, Katherine Chen</h2>
 
 _END;
-	
+
 	$pollModel = new PollModel();
 	$userModel = new UserModel();
-	$topPolls = $pollModel->getTopPolls($user_id, $sort_by, $page, $asc);
+	$topPolls = $pollModel->getTopPolls($user_id, $sortby, $page, $asc);
 	$count = 0;
 	
 	function sortPic($check){
@@ -98,8 +98,18 @@ _END;
 			</div>
 		</div>
 		<br />
-<?php	}	?>
-
+<?php	}	
+	//if page > 1 show prev
+	//show next
+	if ($page > 1){
+?>
+		<div>
+			<a href="/index.php?sortby=<?=$sortby?>&asc=<?=$asc?>&page=<?=$page-1?>">Prev</a>
+		</div>
+<?php } ?>
+		<div>
+			<a href="/index.php?sortby=<?=$sortby?>&asc=<?=$asc?>&page=<?=$page+1?>">Next</a>
+		</div>
 	</div>
 	
 	
