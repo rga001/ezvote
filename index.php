@@ -8,14 +8,18 @@ function GET($key, $default) {
     return (isset($_GET[$key]) && !empty($_GET[$key])) ? $_GET[$key] : $default;
 }
 //get user id if logged in
-if (isset($_SESSION['user_id']))
-	$user_id = $_SESSION['user_id'];
+if (isset($_SESSION['userid']))
+	$user_id = $_SESSION['userid'];
 else
 	$user_id = -1;
 
 $page = GET('page', 1);
 $sortby = GET('sortby', 'null');
-$asc = GET('asc', 'true');	
+$asc = GET('asc', 'true');
+$filters = $_REQUEST['filters'];
+//echo $filters[0] . ' filters test';	
+//echo $user_id;
+//var_dump($_SESSION);
 //echo $sortby . $page . $asc;
 
 ?>
@@ -31,6 +35,15 @@ $asc = GET('asc', 'true');
 				$("#poll"+id).slideDown();
 			}
 		});
+		$('.sortLink').click(function(){
+			var url = $(this).attr('href');
+			$('.checkFilters').each(function(){
+				if ($(this).is(':checked')){
+					url+= "&filters[]=" + $(this).val();
+				}
+			});
+			$(this).prop('href', url);
+		});
 	});
 </script>
 <?php
@@ -43,7 +56,7 @@ _END;
 
 	$pollModel = new PollModel();
 	$userModel = new UserModel();
-	$topPolls = $pollModel->getTopPolls($user_id, $sortby, $page, $asc);
+	$topPolls = $pollModel->getTopPolls($user_id, $sortby, $page, $asc, $filters);
 	$count = 0;
 	
 	function sortPic($check){
@@ -51,9 +64,9 @@ _END;
 		$link = '';
 		if ($sortby == $check)
 			if ($asc == 'true')
-				$link = '<img src="asc.jpg" alt="asc">';
+				$link = '<img src="asc.jpg" alt="asc" id="' . $check. '" class="ascImg">';
 			else
-				$link = '<img src="desc.jpg" alt="desc">';
+				$link = '<img src="desc.jpg" alt="desc" id="' . $check . '" class="ascImg">';
 		return $link;
 	}
 	function ascCheck($check){
@@ -63,17 +76,35 @@ _END;
 			$result = 'false';
 		return $result;
 	}
+	function filterCheck($check){
+		global $filters;
+		$result = '';
+		foreach($filters as $checked){
+			if ($checked == $check)
+				$result = 'checked';
+		}
+		return $result;
+	}
 	
 ?>
 	<div style="width:80%; background: white;margin-left: auto; margin-right: auto;">
 		<div style="padding-bottom:1em;">
 			<label>Sort by: </label>
-			<a href="/index.php?sortby=start&asc=<?=ascCheck('start')?>" style="padding-left:1em;">Poll Open</a><?=sortPic('start')?>
-			<a href="/index.php?sortby=end&asc=<?=ascCheck('end')?>" style="padding-left:1em;">Poll Close</a><?=sortPic('end')?>
-			<a href="/index.php?sortby=create&asc=<?=ascCheck('create')?>" style="padding-left:1em;">Created Date</a><?=sortPic('create')?>
-			<a href="/index.php?sortby=pop&asc=<?=ascCheck('pop')?>" style="padding-left:1em;">Popular Polls</a><?=sortPic('pop')?>
+			<form method="get" action="index.php" id="filterForm">
+			<a class="sortLink" href="/index.php?sortby=start&asc=<?=ascCheck('start')?>" style="padding-left:1em;" id="startLink">Poll Open</a><?=sortPic('start')?>
+			<a class="sortLink" href="/index.php?sortby=end&asc=<?=ascCheck('end')?>" style="padding-left:1em;" id="endLink">Poll Close</a><?=sortPic('end')?>
+			<a class="sortLink" href="/index.php?sortby=create&asc=<?=ascCheck('create')?>" style="padding-left:1em;" id="createLink">Created Date</a><?=sortPic('create')?>
+			<a class="sortLink" href="/index.php?sortby=pop&asc=<?=ascCheck('pop')?>" style="padding-left:1em;" id="popLink">Popular Polls</a><?=sortPic('pop')?>
+			<br />
+				<input type="checkbox" name="filters[]" value="closed" class="checkFilters" <?=filterCheck('closed')?> />Closed Polls
+<?php if (!($user_id == -1)) {?>
+				<input type="checkbox" name="filters[]" value="voted" class="checkFilters" <?=filterCheck('voted')?> />My Votes
+				<input type="checkbox" name="filters[]" value="group" class="checkFilters" <?=filterCheck('group')?> />Group Polls
+<?php	}	?>	
+			</form>
 		</div>
-<?php	
+<?php
+
 	while ($row = mysql_fetch_array($topPolls)){
 		$tmpRow = $userModel->getUserInfo($row['creator_id']);
 		$tmpCreator = mysql_fetch_array($tmpRow);
@@ -101,6 +132,7 @@ _END;
 <?php	}	
 	//if page > 1 show prev
 	//show next
+	//need to change this to get a pollcount or something so you cant click next forever
 	if ($page > 1){
 ?>
 		<div>

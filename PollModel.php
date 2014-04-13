@@ -4,7 +4,18 @@ include_once("database.php");
 
 class PollModel{
 	//return poll id's sorted by popularity or something
-	public function getTopPolls($user_id, $sortby, $page, $asc){
+	public function getTopPolls($user_id, $sortby, $page, $asc, $filters){
+		$onlyGroup = 'false';
+		$onlyVoted = 'false';
+		for ($i = 0; $i < count($filters); $i++)
+			switch ($filters[$i]){
+				case 'closed':
+					$where .= ' AND p.end_date <= NOW() '; break;
+				case 'voted':
+					$onlyVoted = 'true'; break;
+				case 'group':
+					$onlyGroup = 'true'; break;
+			}
 		switch ($sortby){
 			case 'start':
 				$orderby = " ORDER BY start_date "; break;
@@ -22,9 +33,27 @@ class PollModel{
 		else
 			$orderby .= ' DESC';
 		$limit = ($page - 1) * 10;
-		$query = "SELECT p.*, COUNT(DISTINCT(v.user_id)) FROM extreme_voting.poll_info p LEFT OUTER JOIN extreme_voting.poll_vote v ON v.poll_id = p.poll_id WHERE (p.public = 1 OR p.creator_id = $user_id) GROUP BY p.poll_id";
+		$query = "SELECT p.*, COUNT(DISTINCT(v.user_id)) as votes ".
+					"FROM extreme_voting.poll_info p ".
+					"LEFT OUTER JOIN extreme_voting.poll_vote v ON v.poll_id = p.poll_id ".
+					"LEFT OUTER JOIN extreme_voting.group_polls gp ON gp.poll_id = p.poll_id ".
+					"LEFT OUTER JOIN extreme_voting.group_members gm ON gm.group_id = gp.group_id ".
+					"WHERE (p.public = 1 OR p.creator_id = $user_id) ";
+		$query .= $where;
+		if ($onlyGroup == 'false')
+			$query .= " AND gp.poll_id IS NULL";
+		$query .= " GROUP BY p.poll_id ";
+		if ($onlyGroup == 'true'){
+			if($onlyVoted == 'true'){
+				$query .= " HAVING (COUNT(gm.member_id = $user_id) > 0) AND (COUNT(v.user_id = $user_id) > 0)";
+			}
+			else{
+				$query .= " HAVING (COUNT(gm.member_id = $user_id) > 0)";
+			}
+		}
 		$query .= $orderby;
 		$query .= " LIMIT $limit, 10";
+		//echo $query;
 		return queryMysql($query);
 	}
 	
