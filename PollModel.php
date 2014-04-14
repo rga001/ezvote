@@ -21,8 +21,8 @@ class PollModel{
 			$orderby .= ' ASC';
 		else
 			$orderby .= ' DESC';
-		$query = 'SELECT p.poll_id, COUNT(DISTINCT(v.user_id)) FROM extreme_voting.poll_info p LEFT OUTER JOIN extreme_voting.poll_votes v ON v.poll_id = p.poll_id WHERE (p.public = 1 OR p.creator_id = $user_id) ';
-		$query .= $orderby;
+		$query = "SELECT p.poll_id, COUNT(DISTINCT(v.user_id)) FROM extreme_voting.poll_info p LEFT OUTER JOIN extreme_voting.poll_vote v ON v.poll_id = p.poll_id WHERE (p.public = 1 OR p.creator_id = $user_id) GROUP BY p.poll_id ";
+		echo $query;
 		return queryMysql($query);
 	}
 	
