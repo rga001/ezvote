@@ -24,7 +24,7 @@ if(!($userModel->userPermissionPoll($poll_id, $user_id)))
 }
 
 //set variables
-$error = $vote = $comment = "";
+$error = $vote = $comment = $comment_error = "";
 
 //form validation
 if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submitvote']))
@@ -52,7 +52,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submitcomment']))
 		$pollModel->insertComment($poll_id, $user_id, $comment);
 	}
 	else
-		$error = "ERROR: No comment written<br>";
+		$comment_error = "ERROR: No comment written<br>";
 }
 //poll title and description
 echo "<h1>".htmlspecialchars($poll['title'])."</h1>";
@@ -133,20 +133,24 @@ if(!($pollModel->validPollDate($poll_id)))
 echo "<br>";
 
 if($poll['comments'] == 1)
-{	echo "<br>Comments<br>";
+{	
+	echo "$comment_error";
+	echo "Comments<br>";
 	echo "<form method='post' action='viewpoll.php?pollid=$poll_id'>";
 	echo "<textarea name='comment' rows='3' cols='50' maxlength='300' required></textarea><br>";
 	echo "<input type='submit' name='submitcomment' value='Submit Comment'></form>";
 	
+	echo "<br>";
 	$poll_comments = $pollModel->allComments($poll_id);
 	$comments_user = "";
-	echo "<br>Comments<br>";
+	echo "<table>";
 	while($row = mysql_fetch_array($poll_comments))
 	{
 		if($poll['anonymous'] == 1)
 			$comments_user = $row['username'];
 		else
 			$comments_user = $row['firstname'] . " " . $row['lastname'];
-		echo htmlspecialchars($comments_user) . ": " . $row['comment'] . "<br>";
+		echo "<tr><td>" . htmlspecialchars($comments_user) . ": </td><td>" . $row['comment'] . "</td></tr>";
 	}
+	echo "</table>";
 }
