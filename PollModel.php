@@ -77,6 +77,15 @@ class PollModel{
 		queryMysql($query);
 	}
 	
+	//return group name that poll is in
+	public function pollGroup($poll_id)
+	{
+		$query = "SELECT groups.name FROM groups, group_polls " .  
+		"WHERE group_polls.poll_id = $poll_id AND group_polls.group_id = groups.group_id";
+		$groupname = mysql_fetch_array(queryMysql($query));
+		return $groupname['name'];
+	}
+	
 	//shows if user has already voted on poll
 	public function votedAlready($poll_id, $user_id)
 	{
@@ -128,7 +137,8 @@ class PollModel{
 	{
 		$query = "SELECT start_date, end_date FROM poll_info WHERE poll_id = $poll_id";
 		$poll = mysql_fetch_array(queryMysql($query));
-		if(new DateTime() > new DateTime($end_date))
+		$pollEndDate = substr($poll['end_date'], 0, -9);
+		if(new DateTime() > new DateTime($pollEndDate))
 			return false;
 		else
 			return true;
@@ -172,6 +182,21 @@ class PollModel{
 			$voter_names = "No votes yet";
 
 		return $voter_names;
+	}
+	
+	//add comment to database
+	public function insertComment($poll_id, $user_id, $comment)
+	{
+		$query = "INSERT INTO poll_comments VALUES (NULL, $user_id, $poll_id, '$comment', 0, 0)";
+		queryMysql($query);
+	}
+	
+	//return comments for a poll
+	public function allComments($poll_id)
+	{
+		$query = "SELECT poll_comments.comment, users.firstname, users.lastname, users.username" .
+				 " FROM poll_comments, users WHERE poll_comments.poll_id = $poll_id AND poll_comments.user_id = users.userid";
+		return queryMysql($query);
 	}
 }
 
