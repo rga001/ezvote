@@ -25,6 +25,8 @@ if(!($userModel->userPermissionPoll($poll_id, $user_id)))
 
 //set variables
 $error = $vote = $comment = $comment_error = "";
+$changevote = false;
+$viewresults = false;
 
 //form validation
 if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submitvote']))
@@ -34,11 +36,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submitvote']))
 		$vote = $_POST['choice'];
 		
 		//input vote to database
-		if(!($pollModel->votedAlready($poll_id, $user_id)))
-			$pollModel->votePoll($poll_id, $user_id, $vote);
+		$pollModel->votePoll($poll_id, $user_id, $vote);
 	}
 	else 
 		$error = "ERROR: Please select a choice.<br>";
+}
+
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['changevote']))
+{
+	$changevote = true;
+}
+
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['viewresults']))
+{
+	$viewresults = true;
 }
 
 //comments validation
@@ -75,8 +86,8 @@ if($poll['description'] != "")
 	echo "Description: " . htmlspecialchars($poll['description']) . "<br><br>";
 
 //view results if already voted or if not logged in
-if(!($userModel->userIsLoggedIn()) || $pollModel->votedAlready($poll_id, $user_id)
-|| !($pollModel->validPollDate($poll_id)))
+if(!($userModel->userIsLoggedIn()) || ($pollModel->votedAlready($poll_id, $user_id) && $changevote == false)
+|| !($pollModel->validPollDate($poll_id)) || $viewresults == true)
 {
 	echo "<table><tbody>";
 	echo "<tr><td>Choices</td><td>Votes</td></tr>";
@@ -94,6 +105,13 @@ if(!($userModel->userIsLoggedIn()) || $pollModel->votedAlready($poll_id, $user_i
 		echo "<tr title='$voters'><td>$choice</td><td>$tally</td></tr>";
 	}
 	echo "</tbody>";
+	if($userModel->userIsLoggedIn() && $pollModel->validPollDate($poll_id))
+	{
+		echo "<tfoot>";
+		echo "<form method='post' action='viewpoll.php?pollid=$poll_id'>";
+		echo "<tr><td colspan='2'><input type='submit' name='changevote' value='Change Vote'></td></tr></form>";
+		echo "</tfoot>";
+	}
 	echo "</table>";
 }
 //poll choices to vote from if you haven't voted yet
@@ -107,8 +125,18 @@ else
 		echo "<tr><td><input type='radio' name='choice' value=$choice>$choice</td></tr>";
 	}
 	echo "</tbody><tfoot>";
-	echo "<tr><td><input type='submit' name='submitvote' value='Vote'></td></tr>";
-	echo "</table></form>";
+	echo "<tr><td><input type='submit' name='submitvote' value='Vote'></form></td>";
+	echo "<td><form method='post' action='viewpoll.php?pollid=$poll_id'>";
+	echo "<input type='submit' name='viewresults' value='View Results'></form></td></tr>";
+	if($poll['creator_id'] == $user_id && $pollModel->noVotesYet($poll_id))
+	{
+		echo "<form method='post' action='create.php'>";
+		echo "<input type='hidden' name='editpollid' value=$poll_id>";
+		echo "<tr><td colspan='2'><input type='hidden' name='editpollid' value=$poll_id>";
+		echo "<input type='submit' name='editpoll' value='Edit Poll'></td></tr></form>";
+	}
+	echo "</tfoot>";
+	echo "</table>";
 }
 
 //list things

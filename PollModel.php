@@ -73,6 +73,9 @@ class PollModel{
 	//vote on poll
 	public function votePoll($poll_id, $user_id, $answer)
 	{
+		$query = "DELETE FROM poll_vote WHERE poll_id = $poll_id AND user_id = $user_id";
+		queryMysql($query);
+		
 		$query = "INSERT into poll_vote VALUES($poll_id, $user_id, '$answer')";
 		queryMysql($query);
 	}
@@ -94,6 +97,17 @@ class PollModel{
 			return false;
 		else
 			return true;
+	}
+	
+	//if poll has already been voted on
+	public function noVotesYet($poll_id)
+	{
+		$query = "SELECT * FROM poll_vote WHERE poll_id=$poll_id";
+		$numVotes = mysql_num_rows(queryMysql($query));
+		if($numVotes == 0)
+			return true;
+		else
+			return false;
 	}
 	
 	//retrieves number of votes on a certain choice for a poll

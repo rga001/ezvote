@@ -7,6 +7,10 @@ $pollModel = new PollModel();
 $userModel = new UserModel();
 $user_id = $_SESSION['userid'];
 
+//redirect to index.php if user is not logged in
+if(!($userModel->userIsLoggedIn()))
+	die('<meta http-equiv="REFRESH" content="0; url=index.php">');
+
 echo <<<_END
 
 <!-- jquery datepicker sources -->
@@ -58,8 +62,52 @@ function validateDate($date, $format = 'm/d/Y')
     return $d && $d->format($format) == $date;
 }
 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['editpoll']))
+//edit poll
+{
+	$poll_id = $_POST['editpollid'];
+	$poll_info = mysql_fetch_array($pollModel->getPollInfo($poll_id));
+	$poll_title = $poll_info['title'];
+	$description = $poll_info['description'];
+	
+	$is_public = $poll_info['public'];
+	if($is_public == 1)
+	{
+		$public_checked = 'checked';
+		$private_checked = "";
+	}
+	else
+	{
+		$public_checked = "";
+		$private_checked = 'checked';
+		$group_chosen = $pollModel->pollGroup($poll_id);
+		$disabled = "";
+	}
+	
+	$anonymous = $poll_info['anonymous'];
+	if($anonymous == 1)
+		$anon_checked = 'checked';
+	else
+		$anon_checked = "";
+		
+	$comments_disabled = $poll_info['comments'];
+	if($comments_disabled == 0)
+		$cd_checked = 'checked';
+	else
+		$cd_checked = "";
+		
+	$date = $poll_info['end_date'];
+	$date = substr($date, 0, -9);
+	$tmp_date = explode("-", $date);
+	$date = $tmp_date[1] . '/' . $tmp_date[2] . '/' . $tmp_date[0];
+	
+	$choice_info = $pollModel->getPollChoices($poll_id);
+	while($choice_row = mysql_fetch_array($choice_info))
+		$choices[] = $choice_row['choice'];
+}
+
 //form validation
-if($_SERVER['REQUEST_METHOD'] == 'POST')
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit']))
 {	
 	//poll title
 	if(isset($_POST['poll_title']))
@@ -236,7 +284,10 @@ $groups = $userModel->userGroups($user_id);
 while($groups_row = mysql_fetch_array($groups))
 {
 	$group = $groups_row['name'];
-	echo "<option value='$group'>$group</option>";
+	if($group == $group_chosen)
+		echo "<option value='$group' selected>$group</option>";
+	else
+		echo "<option value='$group'>$group</option>";
 }
 echo <<<_END
 </select>
@@ -283,7 +334,7 @@ echo <<<_END
 </table>
 
 <!-- Submit button -->
-<input type='submit' value='Submit'>
+<input type='submit' name='submit' value='Submit'>
 
 <!-- Reset button -->
 <input type='reset' value='Reset'>
