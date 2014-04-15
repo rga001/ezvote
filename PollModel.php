@@ -70,7 +70,7 @@ class PollModel{
 		return queryMysql($query);
 	}
 	
-	//vote on poll
+	//insert or change a user's poll vote
 	public function votePoll($poll_id, $user_id, $answer)
 	{
 		$query = "DELETE FROM poll_vote WHERE poll_id = $poll_id AND user_id = $user_id";
@@ -99,7 +99,7 @@ class PollModel{
 			return true;
 	}
 	
-	//if poll has already been voted on
+	//shows if poll has already been voted on by anyone
 	public function noVotesYet($poll_id)
 	{
 		$query = "SELECT * FROM poll_vote WHERE poll_id=$poll_id";
@@ -127,10 +127,23 @@ class PollModel{
 		queryMysql($query);
 	}
 	
-	//insert multiple choices after poll creation to the database
-	public function insertChoices($choices)
+	//edit a poll
+	public function editPoll($poll_id, $poll_title, $description, $is_public, $comments_disabled, $anonymous, $end_date)
 	{
-		$poll_id = mysql_insert_id();
+		$query = "UPDATE poll_info SET title='$poll_title', description='$description', public=$is_public, comments=$comments_disabled, " .
+				"anonymous=$anonymous, end_date='$end_date' WHERE poll_id=$poll_id";
+		queryMysql($query);
+	}
+	
+	//insert multiple choices after poll creation to the database
+	public function insertChoices($choices, $poll_id)
+	{
+		if($poll_id == 0)
+			$poll_id = mysql_insert_id();
+		
+		$query = "DELETE FROM poll_choices WHERE poll_id = $poll_id";
+		queryMysql($query);
+		
 		for($i = 0; $i < sizeof($choices); $i++)
 		{
 			$query = "INSERT INTO poll_choices VALUES($poll_id, '$choices[$i]')";
@@ -139,10 +152,20 @@ class PollModel{
 		return $poll_id;
 	}
 	
-	//insert poll_id into group_poll
+	//insert poll into group_poll
 	public function insertGroupPoll($poll_id, $group_chosen)
 	{
+		$query = "DELETE FROM group_polls WHERE poll_id = $poll_id";
+		queryMysql($query);
+		
 		$query = "INSERT INTO group_polls (group_id, poll_id) select group_id, $poll_id from groups where name = '$group_chosen'";
+		queryMysql($query);
+	}
+	
+	//remove group from group_polls if edited to be public
+	public function makePublic($poll_id)
+	{
+		$query = "DELETE FROM group_polls WHERE poll_id = $poll_id";
 		queryMysql($query);
 	}
 	

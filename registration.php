@@ -1,11 +1,6 @@
 <?php //registration.php
 //register for the website
 
-/*
- * things to do:
- * remove email from here and database
- */
-
 include_once 'header.php';
 
 $userModel = new userModel();
@@ -18,9 +13,7 @@ if($userModel->userIsLoggedIn())
 	die('<meta http-equiv="REFRESH" content="0; url=index.php">');
 
 //form validation
-if($_SERVER['REQUEST_METHOD'] == 'POST' && 
-	(isset($_POST['email2']) || isset($_POST['firstname2']) || isset($_POST['lastname2'])
-	 || isset($_POST['username2']) || isset($_POST['password2']) || isset($_POST['password2']))) 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['registration'])) 
 {
 	//user input
 	$email = strtolower(trim($_POST['email2']));
@@ -83,7 +76,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' &&
 		$userModel->registerUser($email, $firstname, $lastname, $username, $password);
 		
 		//login user
-		$userModel->loginUser($email, $password);
+		$userModel->loginUser($username, $password);
 		
 		//continue to home page
 		die('<meta http-equiv="REFRESH" content="0; url=index.php">');
@@ -105,7 +98,7 @@ echo <<<_END
 		<tr><td>Confirm Password</td><td><input type='password' maxlength='16' name='confirm_password2' required></td></tr>
 	</tbody>
 	<tfoot>
-		<tr><td><input type='submit' value='Create Account'></td></tr>
+		<tr><td><input type='submit' name='registration' value='Create Account'></td></tr>
 	</tfoot>
 </table>
 </form>
