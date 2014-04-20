@@ -12,16 +12,20 @@ class UserModel{
 	//return user poll information (past poll info) 
 	
 	//register user to database
-	public function registerUser($email, $firstname, $lastname, $username, $password)
+	public function registerUser($email, $firstname, $lastname, $username, $saltedPW, $salt)
 	{
-		$query = "INSERT INTO users VALUES(NULL, '$email', '$firstname', '$lastname', '$username', '$password')";
+		$query = "INSERT INTO users VALUES(NULL, '$email', '$firstname', '$lastname', '$username', '$saltedPW', '$salt')";
 		queryMysql($query);
 	}
 	
 	//check to see if user input correct login info
 	public function checkUserInfo($username, $password)
 	{
-		$query = "SELECT * FROM users WHERE username='$username' AND password='$password'";
+		$getSalt = "SELECT salt FROM users WHERE username='$username'";
+		$saltRow = mysql_fetch_array(queryMysql($getSalt));
+		$hashed = hash('sha256', $password + $saltRow['salt']);
+		
+		$query = "SELECT * FROM users WHERE username='$username' AND password='$hashed'";
 		if (mysql_num_rows(queryMysql($query)) == 0)
 			return false;
 		else
@@ -31,7 +35,11 @@ class UserModel{
 	//log in user with sessions
 	public function loginUser($username, $password)
 	{
-		$query = "SELECT * FROM users WHERE username='$username' AND password='$password'";
+		$getSalt = "SELECT salt FROM users WHERE username='$username'";
+		$saltRow = mysql_fetch_array(queryMysql($getSalt));
+		$hashed = hash('sha256', $password + $saltRow['salt']);
+		
+		$query = "SELECT * FROM users WHERE username='$username' AND password='$hashed'";
 		$row = mysql_fetch_array(queryMysql($query));
 		
 		$_SESSION['userid'] = $row['userid'];
