@@ -51,7 +51,8 @@ $userModel = new UserModel();
 	}
 
 echo <<<_END
-<h1>Join Group</h1>$error
+<div class="formstyle">
+<h1 class="heading">Join Group</h1>$error
 
 <head>
 <script>
@@ -80,16 +81,17 @@ echo <<<_END
 <form method='post' action='join_group.php' onsubmit= "return ValidateForm();">
 <table>
 	<tbody> 
-		<tr><td>Group Name</td><td><input type='gn' maxlength='254' name='gn' id='gn' value='$gn' required></td></tr>
-		<tr><td>Group password</td><td><input type='password' maxlength='16' name='gpassword' id='pw' required></td></tr>
+		<tr><td>Group Name: </td><td><input type='gn' maxlength='254' name='gn' id='gn' value='$gn' required></td></tr>
+		<tr><td>Group password: </td><td><input type='password' maxlength='16' name='gpassword' id='pw' required></td></tr>
 	</tbody>
 	<tfoot>
 		<tr><td><input type='submit' value='Join Group'></td></tr>
 	</tfoot>
 </table>
-</form>
+</form><br><br>
 
 </body>
 </html>
+</div>
 _END;
 ?>

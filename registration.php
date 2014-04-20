@@ -96,26 +96,28 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['registration']))
 
 //sign up form
 echo <<<_END
-<h1>Registration</h1><span class='error'>$error</span>
+<div class="formstyle">
+<h1 class="heading">Registration</h1><span class='error'>$error</span>
 
 <form method='post' action='registration.php'>
 <table>
 	<tbody>
-		<tr><td>Email</td><td><input type='email' maxlength='254' name='email2' value='$email' required></td></tr>
-		<tr><td>Username</td><td><input type='text' maxlength='20' name='username2' value='$username' required></td></tr>
-		<tr><td>First Name</td><td><input type='text' maxlength='20' name='firstname2' value='$firstname' required></td></tr>
-		<tr><td>Last Name</td><td><input type='text' maxlength='20' name='lastname2' value='$lastname' required></td></tr>
-		<tr><td>Password</td><td><input type='password' maxlength='16' name='password2' required></td></tr>
-		<tr><td>Confirm Password</td><td><input type='password' maxlength='16' name='confirm_password2' required></td></tr>
+		<tr><td>Email: </td><td><input type='email' maxlength='254' name='email2' value='$email' required></td></tr>
+		<tr><td>Username: </td><td><input type='text' maxlength='20' name='username2' value='$username' required></td></tr>
+		<tr><td>First Name: </td><td><input type='text' maxlength='20' name='firstname2' value='$firstname' required></td></tr>
+		<tr><td>Last Name: </td><td><input type='text' maxlength='20' name='lastname2' value='$lastname' required></td></tr>
+		<tr><td>Password: </td><td><input type='password' maxlength='16' name='password2' required></td></tr>
+		<tr><td>Confirm Password: </td><td><input type='password' maxlength='16' name='confirm_password2' required></td></tr>
 	</tbody>
 	<tfoot>
 		<tr><td><input type='submit' name='registration' value='Create Account'></td></tr>
 	</tfoot>
 </table>
-</form>
+</form><br><br>
 
 </body>
 </html>
+</div>
 _END;
 
 ?> 
