@@ -55,7 +55,11 @@ $filters = $_REQUEST['filters'];
 					url+= "&filters[]=" + $(this).val();
 				}
 			});
-			$(this).prop('href', url);
+			if(url==''){
+				url = "index.php";
+			}
+			$('#filterForm').prop('action', url);
+			$('#filterForm').submit();
 		});
 	});
 </script>
@@ -77,7 +81,7 @@ _END;
 		$link = '';
 		if ($sortby == $check)
 			if ($asc == 'true')
-				$link = '<img src="asc.jpg" alt="asc" id="' . $check. '" class="ascImg">';
+				$link = '<img src="asce.jpg" alt="asce" id="' . $check. '" class="ascImg">';
 			else
 				$link = '<img src="desc.jpg" alt="desc" id="' . $check . '" class="ascImg">';
 		return $link;
@@ -98,23 +102,30 @@ _END;
 		}
 		return $result;
 	}
+	function selected($check){
+		$selected = '';
+		if (sortPic($check) != ''){
+			$selected = 'selected';
+		}
+		return $selected;
+	}
 	
 ?>
 	<div style="width:80%; background: white;margin-left: auto; margin-right: auto;">
-		<div style="padding-bottom:1em;">
+		<div style="padding-bottom:1em;width:50%;margin: 0 auto;">
 			<label>Sort by: </label>
-			<form method="get" action="index.php" id="filterForm">
-			<button class="sortBtn" type="button" name="/index.php?sortby=start&asc=<?=ascCheck('start')?>" style="padding-left:1em;" id="startLink">Poll Open</button><?=sortPic('start')?>
-			<button class="sortBtn" type="button" name="/index.php?sortby=end&asc=<?=ascCheck('end')?>" style="padding-left:1em;" id="endLink">Poll Close</button><?=sortPic('end')?>
-			<button class="sortBtn" type="button" name="/index.php?sortby=create&asc=<?=ascCheck('create')?>" style="padding-left:1em;" id="createLink">Created Date</button><?=sortPic('create')?>
-			<button class="sortBtn" type="button" name="/index.php?sortby=pop&asc=<?=ascCheck('pop')?>" style="padding-left:1em;" id="popLink">Popular Polls</button><?=sortPic('pop')?>
+			<form method="post" action="index.php?sortby=end&asc=true" id="filterForm" name="sortForm">
+			<button class="sortBtn <?=selected('start')?>" type="button" name="index.php?sortby=start&asc=<?=ascCheck('start')?>" style="padding-left:1em;color:#0099CC;background:#2D3232" id="startLink">Poll Open</button><?=sortPic('start')?>
+			<button class="sortBtn <?=selected('end')?>" type="button" name="index.php?sortby=end&asc=<?=ascCheck('end')?>" style="padding-left:1em;color:#0099CC;background:#2D3232" id="endLink">Poll Close</button><?=sortPic('end')?>
+			<button class="sortBtn <?=selected('create')?>" type="button" name="index.php?sortby=create&asc=<?=ascCheck('create')?>" style="padding-left:1em;color:#0099CC;background:#2D3232" id="createLink">Created Date</button><?=sortPic('create')?>
+			<button class="sortBtn <?=selected('pop')?>" type="button" name="index.php?sortby=pop&asc=<?=ascCheck('pop')?>" style="padding-left:1em;color:#0099CC;background:#2D3232" id="popLink">Popular Polls</button><?=sortPic('pop')?>
 			<br />
 				<input type="checkbox" name="filters[]" value="closed" class="checkFilters" <?=filterCheck('closed')?> />Closed Polls
 <?php if (!($user_id == -1)) {?>
 				<input type="checkbox" name="filters[]" value="voted" class="checkFilters" <?=filterCheck('voted')?> />My Votes
 				<input type="checkbox" name="filters[]" value="group" class="checkFilters" <?=filterCheck('group')?> />Group Polls
 <?php	}	?>	
-			<button type="submit" id="sortSubmit">Sort Polls</button>
+			<input type="submit" id="sortSubmit" value="Sort Polls" />
 			</form>
 		</div>
 <?php
