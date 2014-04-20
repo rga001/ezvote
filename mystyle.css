@@ -2,20 +2,25 @@
 	font-family :calibri;
 }
 
-
+/*Setting the background image and color*/
 body{margin:0;
-	 background-size: cover;
 	 background-repeat: no-repeat;
 	 background-color: white;
-	}
-	 
+	 background-image:url('EzVote.jpg');
+	 background-attachment:fixed;
+	 background-size:20%;
+	 background-position:0% 13%;}
+
+/*Sets the style for the links both before and after they have been visited in the header*/							  
 a.linky:link, a.linky:visited{text-decoration: none; 
-							  display: inline-block; 
-							  text-align: center; 
-							  line-height: 55px; 
-							  width: 80px; 
-							  color: #0099CC;}
+																  display: inline-block; 
+																  text-align: center; 
+																  line-height: 55px; 
+																  padding-left: 10px;
+																  padding-right: 10px;
+																  color: #0099CC;}
 				  
+/*Sets the style for the links in the header including "create group" when the mouse hovers over the links*/				  
 a.linky:hover {background: -moz-linear-gradient(top,  rgba(0,153,204,1) 0%, rgba(0,153,204,0.99) 1%, rgba(0,153,204,0.5) 58%, rgba(0,153,204,0.5) 83%, rgba(0,153,204,0.5) 100%); 
 			  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,153,204,1)), color-stop(1%,rgba(0,153,204,0.99)), color-stop(58%,rgba(0,153,204,0.5)), color-stop(83%,rgba(0,153,204,0.5)), color-stop(100%,rgba(0,153,204,0.5))); 
 			  background: -webkit-linear-gradient(top,  rgba(0,153,204,1) 0%,rgba(0,153,204,0.99) 1%,rgba(0,153,204,0.5) 58%,rgba(0,153,204,0.5) 83%,rgba(0,153,204,0.5) 100%); 
@@ -25,41 +30,99 @@ a.linky:hover {background: -moz-linear-gradient(top,  rgba(0,153,204,1) 0%, rgba
 			  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0099cc', endColorstr='#800099cc',GradientType=0 ); 
 			  color: white;}
 		
-a.linky{border-style:solid; 
-		border-left-color: #383838; 
-		border-right-color: #383838; 
-		border-top:none; 
-		border-bottom:none; 
-		border-width:1px;}
+/*Sets the style for the poll sorting links on the home page and the user page*/
+a.sortLink{text-decoration: none;
+		   display: inline-block;
+		   text-align: center;
+		   width: 80px;
+		   color: white;}
  
-#guest{padding-top: 17px; 
-	   padding-left: 10px;
-	   padding-right: 20px;
-	   float:left; 
+ /*Positions the greeting for the guest and user*/
+#guest{padding-left: 10px;
+       padding-right: 10px;
+       display: inline-block;
 	   color: #0099CC}
 	   
-#links {background: fixed; 
+/*Sets the style for the header*/	   
+#links {position: fixed;
 	   background-color: #2D3232; 
-	   height: 55px; 
-	   color: #0099CC;}
+	   height: 55px;
+	   width: 100%;}
 	  
-#login{position:absolute; top:0; right:0;
+/*Sets the style for the log in "username" and "password"*/	  
+#login{position:fixed; top:0; right:0;
 	   color: white; 
 	   padding-right: 10px;
 	   border-collapse: collapse;}
 
+/*Ads padding between the "username", "password", and login button*/
 #login td{padding-right: 5px;}
 
+/*Sets the color of error messages to red*/
 .error{color:red;}
 
-#banner{height: 148px;
-		background: -moz-linear-gradient(top, rgba(255,255,255,0.54) 0%, rgba(0,0,0,0.55) 3%, rgba(89,88,83,0.6) 18%, rgba(33,33,31,0.71) 50%, rgba(12,12,12,0.87) 100%); /* FF3.6+ */
-		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.54)), color-stop(3%,rgba(0,0,0,0.55)), color-stop(18%,rgba(89,88,83,0.6)), color-stop(50%,rgba(33,33,31,0.71)), color-stop(100%,rgba(12,12,12,0.87))); /* Chrome,Safari4+ */
-		background: -webkit-linear-gradient(top, rgba(255,255,255,0.54) 0%,rgba(0,0,0,0.55) 3%,rgba(89,88,83,0.6) 18%,rgba(33,33,31,0.71) 50%,rgba(12,12,12,0.87) 100%); /* Chrome10+,Safari5.1+ */
-		background: -o-linear-gradient(top, rgba(255,255,255,0.54) 0%,rgba(0,0,0,0.55) 3%,rgba(89,88,83,0.6) 18%,rgba(33,33,31,0.71) 50%,rgba(12,12,12,0.87) 100%); /* Opera 11.10+ */
-		background: -ms-linear-gradient(top, rgba(255,255,255,0.54) 0%,rgba(0,0,0,0.55) 3%,rgba(89,88,83,0.6) 18%,rgba(33,33,31,0.71) 50%,rgba(12,12,12,0.87) 100%); /* IE10+ */
-		background: linear-gradient(to bottom, rgba(255,255,255,0.54) 0%,rgba(0,0,0,0.55) 3%,rgba(89,88,83,0.6) 18%,rgba(33,33,31,0.71) 50%,rgba(12,12,12,0.87) 100%); /* W3C */
-		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8affffff', endColorstr='#de0c0c0c',GradientType=0 ); /* IE6-9 */
+/*Sets the color and positioning of the options to sort the polls on the main page and user page*/
+.polloptions{color: white;
+			 padding-left: 150px;
+			 padding-top: 10px;}
 
+/*#banner{height: 148px;
+		background: -moz-linear-gradient(top, rgba(255,255,255,0.54) 0%, rgba(0,0,0,0.55) 3%, rgba(89,88,83,0.6) 18%, rgba(33,33,31,0.71) 50%, rgba(12,12,12,0.87) 100%);
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.54)), color-stop(3%,rgba(0,0,0,0.55)), color-stop(18%,rgba(89,88,83,0.6)), color-stop(50%,rgba(33,33,31,0.71)), color-stop(100%,rgba(12,12,12,0.87))); 
+		background: -webkit-linear-gradient(top, rgba(255,255,255,0.54) 0%,rgba(0,0,0,0.55) 3%,rgba(89,88,83,0.6) 18%,rgba(33,33,31,0.71) 50%,rgba(12,12,12,0.87) 100%); 
+		background: -o-linear-gradient(top, rgba(255,255,255,0.54) 0%,rgba(0,0,0,0.55) 3%,rgba(89,88,83,0.6) 18%,rgba(33,33,31,0.71) 50%,rgba(12,12,12,0.87) 100%); 
+		background: -ms-linear-gradient(top, rgba(255,255,255,0.54) 0%,rgba(0,0,0,0.55) 3%,rgba(89,88,83,0.6) 18%,rgba(33,33,31,0.71) 50%,rgba(12,12,12,0.87) 100%); 
+		background: linear-gradient(to bottom, rgba(255,255,255,0.54) 0%,rgba(0,0,0,0.55) 3%,rgba(89,88,83,0.6) 18%,rgba(33,33,31,0.71) 50%,rgba(12,12,12,0.87) 100%); 
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8affffff', endColorstr='#de0c0c0c',GradientType=0 );}*/
 
+/*Sets all the user pages forms style and positioning on the page*/
+.formstyle{width: 450px;
+		   padding-left:100px;
+		   padding-top: 20px;
+		   background-color: #2D3232;
+		   margin-left: 300px;
+		   margin-top: 120px;
+		   border-radius: 10px;
+		   color: white;}
+
+/*Sets the color of the headings for the user page forms*/
+.heading{color:#0099CC;}
+		
+/*Sets the style for the choices section of the create.php page to match the formstyle styling*/
+#Choices{text-align: left;
+		 margin-left: 0px;}
+		 
+#listTable
+{
+	display:table;
+	width:75%;margin-left:auto;
+	margin-right:auto;
+	border-radius: 5px;
+	background-color: white;
+}
+
+#list2
+{
+	display:table-row;
+	background-color: #0099CC;
+}
+
+#list3
+{
+	display:table-cell;
+	padding-top: 1em; 
+	padding-left: 1em; 
+	font-size:large;
+}
+
+#list4
+{
+	float:left;
+	width:50%;
+}
+
+#list5
+{
+	float:left;
+	width:50%;
 }
