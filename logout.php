@@ -1,6 +1,7 @@
 <?php //logout.php
 include_once 'header.php';
 
+//log user out of session
 if (isset($_SESSION['userid']))
 {
     $_SESSION=array();

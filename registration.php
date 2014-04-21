@@ -1,11 +1,6 @@
 <?php //registration.php
 //register for the website
 
-/*
- * things to do:
- * remove email from here and database
- */
-
 include_once 'header.php';
 
 $userModel = new userModel();
@@ -13,22 +8,31 @@ $userModel = new userModel();
 $error = $email = $firstname = $lastname = $username = $password = $password2 = "";
 $has_error = FALSE;
 
+//generate random salt
+function generateSalt(){
+	$salt = '';
+	$seed = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	for($i = 0; $i < 10; $i++){
+		$salt .= $seed[rand(0, strlen($seed) - 1)];
+	}
+	return $salt;
+}
 //if logged in, redirect to index.php
 if($userModel->userIsLoggedIn())
 	die('<meta http-equiv="REFRESH" content="0; url=index.php">');
 
 //form validation
-if($_SERVER['REQUEST_METHOD'] == 'POST' && 
-	(isset($_POST['email2']) || isset($_POST['firstname2']) || isset($_POST['lastname2'])
-	 || isset($_POST['username2']) || isset($_POST['password2']) || isset($_POST['password2']))) 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['registration'])) 
 {
 	//user input
 	$email = strtolower(trim($_POST['email2']));
 	$username = ucfirst(strtolower(trim($_POST['username2'])));
 	$firstname = trim($_POST['firstname2']);
 	$lastname = ucfirst(strtolower(trim($_POST['lastname2'])));
+	$salt = generateSalt();
 	$password = $_POST['password2'];
 	$password2 = $_POST['confirm_password2'];
+	$saltedPW = hash('sha256', $password + $salt);
 	
 	//format first name
 	$tmp_firstname = explode(" ", $firstname);
@@ -80,10 +84,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' &&
 	if($has_error == FALSE)
 	{
 		//register user
-		$userModel->registerUser($email, $firstname, $lastname, $username, $password);
+		$userModel->registerUser($email, $firstname, $lastname, $username, $saltedPW, $salt);
 		
 		//login user
-		$userModel->loginUser($email, $password);
+		$userModel->loginUser($username, $password);
 		
 		//continue to home page
 		die('<meta http-equiv="REFRESH" content="0; url=index.php">');
@@ -92,26 +96,28 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' &&
 
 //sign up form
 echo <<<_END
-<h1>Registration</h1><span class='error'>$error</span>
+<div class="formstyle">
+<h1 class="heading">Registration</h1><span class='error'>$error</span>
 
 <form method='post' action='registration.php'>
 <table>
 	<tbody>
-		<tr><td>Email</td><td><input type='email' maxlength='254' name='email2' value='$email' required></td></tr>
-		<tr><td>Username</td><td><input type='text' maxlength='20' name='username2' value='$username' required></td></tr>
-		<tr><td>First Name</td><td><input type='text' maxlength='20' name='firstname2' value='$firstname' required></td></tr>
-		<tr><td>Last Name</td><td><input type='text' maxlength='20' name='lastname2' value='$lastname' required></td></tr>
-		<tr><td>Password</td><td><input type='password' maxlength='16' name='password2' required></td></tr>
-		<tr><td>Confirm Password</td><td><input type='password' maxlength='16' name='confirm_password2' required></td></tr>
+		<tr><td>Email: </td><td><input type='email' maxlength='254' name='email2' value='$email' required></td></tr>
+		<tr><td>Username: </td><td><input type='text' maxlength='20' name='username2' value='$username' required></td></tr>
+		<tr><td>First Name: </td><td><input type='text' maxlength='20' name='firstname2' value='$firstname' required></td></tr>
+		<tr><td>Last Name: </td><td><input type='text' maxlength='20' name='lastname2' value='$lastname' required></td></tr>
+		<tr><td>Password: </td><td><input type='password' maxlength='16' name='password2' required></td></tr>
+		<tr><td>Confirm Password: </td><td><input type='password' maxlength='16' name='confirm_password2' required></td></tr>
 	</tbody>
 	<tfoot>
-		<tr><td><input type='submit' value='Create Account'></td></tr>
+		<tr><td><input type='submit' name='registration' value='Create Account'></td></tr>
 	</tfoot>
 </table>
-</form>
+</form><br><br>
 
 </body>
 </html>
+</div>
 _END;
 
 ?> 

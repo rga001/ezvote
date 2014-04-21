@@ -30,27 +30,44 @@ $filters = $_REQUEST['filters'];
 		$('.expand').click(function(){
 			var id = $(this).attr("id");
 			if ($("#poll"+id).is(':visible')){
-				$("#poll"+id).slideUp();
+				$("#poll"+id).slideUp(0);
 			}else{
-				$("#poll"+id).slideDown();
+				$("#poll"+id).slideDown(0);
 			}
 		});
-		$('.sortLink').click(function(){
-			var url = $(this).attr('href');
+		$('.sortBtn').click(function(){
+			$('.sortBtn').each(function(){
+				$(this).attr('id', '');
+				$(this).css({'background-color':'#2D3232'});
+				$(this).css({'color':'#0099CC'});
+			});
+			$(this).attr('id', 'selected');
+			$(this).css({'background-color':'#0099CC'});
+			$(this).css({'color':'white'});
+		});
+		$('#sortSubmit').click(function(){
+			var url = '';
+			$('.sortBtn').each(function(){
+				if($(this).prop('id').indexOf('selected') > -1){
+					url = $(this).attr('name');
+				}
+			});
 			$('.checkFilters').each(function(){
 				if ($(this).is(':checked')){
 					url+= "&filters[]=" + $(this).val();
 				}
 			});
-			$(this).prop('href', url);
+			if(url==''){
+				url = "index.php";
+			}
+			$('#filterForm').prop('action', url);
+			$('#filterForm').submit();
 		});
 	});
 </script>
 <?php
 echo <<<_END
 <!--div style="background: url(bg.png) no-repeat center center fixed;display:block;position:absolute;width:100%;height:100%;background-size:cover" -->
-<h1 align="center">Team E: EZvote</h1>
-<h2 align="center">Gage Alvis, Marty Hamilton, Derek Arnold, Katherine Chen</h2>
 
 _END;
 
@@ -64,7 +81,7 @@ _END;
 		$link = '';
 		if ($sortby == $check)
 			if ($asc == 'true')
-				$link = '<img src="asc.jpg" alt="asc" id="' . $check. '" class="ascImg">';
+				$link = '<img src="asce.jpg" alt="asce" id="' . $check. '" class="ascImg">';
 			else
 				$link = '<img src="desc.jpg" alt="desc" id="' . $check . '" class="ascImg">';
 		return $link;
@@ -85,22 +102,30 @@ _END;
 		}
 		return $result;
 	}
+	function selected($check){
+		$selected = '';
+		if (sortPic($check) != ''){
+			$selected = 'selected';
+		}
+		return $selected;
+	}
 	
 ?>
-	<div style="width:80%; background: white;margin-left: auto; margin-right: auto;">
-		<div style="padding-bottom:1em;">
-			<label>Sort by: </label>
-			<form method="get" action="index.php" id="filterForm">
-			<a class="sortLink" href="/index.php?sortby=start&asc=<?=ascCheck('start')?>" style="padding-left:1em;" id="startLink">Poll Open</a><?=sortPic('start')?>
-			<a class="sortLink" href="/index.php?sortby=end&asc=<?=ascCheck('end')?>" style="padding-left:1em;" id="endLink">Poll Close</a><?=sortPic('end')?>
-			<a class="sortLink" href="/index.php?sortby=create&asc=<?=ascCheck('create')?>" style="padding-left:1em;" id="createLink">Created Date</a><?=sortPic('create')?>
-			<a class="sortLink" href="/index.php?sortby=pop&asc=<?=ascCheck('pop')?>" style="padding-left:1em;" id="popLink">Popular Polls</a><?=sortPic('pop')?>
+	<div style="width:65%; background: #2D3232; margin-left: auto; margin-right: auto; margin-top: 200px; padding-top: 20px; border-radius: 10px">
+		<div style="padding-bottom:1em;width:50%;margin: 0 auto;">
+			<h1>Browse Polls</h1>
+			<form method="post" action="index.php?sortby=end&asc=true" id="filterForm" name="sortForm">
+			<button class="sortBtn css" type="button" name="index.php?sortby=start&asc=<?=ascCheck('start')?>" style="padding-left:1em;color:#0099CC;background:#2D3232;border:none;border-radius:5px;" id="startLink <?=selected('start')?>">Poll Open</button><?=sortPic('start')?>
+			<button class="sortBtn" type="button" name="index.php?sortby=end&asc=<?=ascCheck('end')?>" style="padding-left:1em;color:#0099CC;background:#2D3232;border:none;border-radius:5px;" id="endLink <?=selected('end')?>">Poll Close</button><?=sortPic('end')?>
+			<button class="sortBtn" type="button" name="index.php?sortby=create&asc=<?=ascCheck('create')?>" style="padding-left:1em;color:#0099CC;background:#2D3232;border:none;border-radius:5px;" id="createLink <?=selected('create')?>">Created Date</button><?=sortPic('create')?>
+			<button class="sortBtn" type="button" name="index.php?sortby=pop&asc=<?=ascCheck('pop')?>" style="padding-left:1em;color:#0099CC;background:#2D3232;border:none;border-radius:5px;" id="popLink <?=selected('pop')?>">Popular Polls</button><?=sortPic('pop')?>
 			<br />
 				<input type="checkbox" name="filters[]" value="closed" class="checkFilters" <?=filterCheck('closed')?> />Closed Polls
 <?php if (!($user_id == -1)) {?>
 				<input type="checkbox" name="filters[]" value="voted" class="checkFilters" <?=filterCheck('voted')?> />My Votes
 				<input type="checkbox" name="filters[]" value="group" class="checkFilters" <?=filterCheck('group')?> />Group Polls
 <?php	}	?>	
+			<input type="submit" id="sortSubmit" value="Sort Polls" style="float:right"/>
 			</form>
 		</div>
 <?php
@@ -108,8 +133,12 @@ _END;
 	while ($row = mysql_fetch_array($topPolls)){
 		$tmpRow = $userModel->getUserInfo($row['creator_id']);
 		$tmpCreator = mysql_fetch_array($tmpRow);
+		
+		$end_date = substr($row['end_date'], 0, -9);
+		$tmp_date = explode('-', $end_date);
+		$end_date = $tmp_date[1] . "/" . $tmp_date[2] . "/" . $tmp_date[0];
 ?>
-		<div style="display:table;width:75%;margin-left:auto; margin-right:auto; border: 2px solid gray; border-radius: 5px;">
+		<div style="display:table;width:75%;margin-left:auto; margin-right:auto; border: 2px solid gray; border-radius: 5px; background-color:white;">
 			<div style="display:table-row; background-color: lightblue;">
 				<div style="display:table-cell; padding-top: 1em; padding-left: 1em; font-size:large; ">
 					<a href="/viewpoll.php?pollid=<?= $row['poll_id']?>"><?= $row['title']?></a>
@@ -121,7 +150,7 @@ _END;
 					<label style="cursor:pointer;border-left: 2px solid lightgray;"><?= $row['description']?></label>
 				</div>
 				<div style="float:left;width:50%;">
-					<label style="cursor:pointer;">Poll closes at: <?= $row['end_date'] ?></label>
+					<label style="cursor:pointer;">Poll closes at: <?= $end_date ?></label>
 				</div>
 			</div>
 			<div id="poll<?=$row['poll_id'] ?>" style="display:none;width:200px" class="extraInfo">

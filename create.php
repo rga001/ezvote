@@ -7,6 +7,10 @@ $pollModel = new PollModel();
 $userModel = new UserModel();
 $user_id = $_SESSION['userid'];
 
+//redirect to index.php if user is not logged in
+if(!($userModel->userIsLoggedIn()))
+	die('<meta http-equiv="REFRESH" content="0; url=index.php">');
+
 echo <<<_END
 
 <!-- jquery datepicker sources -->
@@ -45,8 +49,9 @@ $(document).ready(function(){
 _END;
 
 //set variables to empty
-$error = $poll_title = $description = $is_public = $group_chosen = $anonymous = $comments_disabled = $date = $start_date = $end_date = "";
+$error = $poll_id = $poll_title = $description = $is_public = $group_chosen = $anonymous = $comments_disabled = $date = $start_date = $end_date = "";
 $public_checked = $private_checked = $anon_checked = $cd_checked = "";
+$poll_editing = FALSE;
 $disabled = 'disabled';
 $has_error = FALSE;
 $choices = array();
@@ -58,9 +63,60 @@ function validateDate($date, $format = 'm/d/Y')
     return $d && $d->format($format) == $date;
 }
 
+//edit poll and retrieve poll information to fill out create form
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['editpoll']))
+{
+	$poll_id = $_POST['editpollid'];
+	$poll_info = mysql_fetch_array($pollModel->getPollInfo($poll_id));
+	$poll_title = $poll_info['title'];
+	$description = $poll_info['description'];
+	
+	$is_public = $poll_info['public'];
+	if($is_public == 1)
+	{
+		$public_checked = 'checked';
+		$private_checked = "";
+	}
+	else
+	{
+		$public_checked = "";
+		$private_checked = 'checked';
+		$group_chosen = $pollModel->pollGroup($poll_id);
+		$disabled = "";
+	}
+	
+	$anonymous = $poll_info['anonymous'];
+	if($anonymous == 1)
+		$anon_checked = 'checked';
+	else
+		$anon_checked = "";
+		
+	$comments_disabled = $poll_info['comments'];
+	if($comments_disabled == 0)
+		$cd_checked = 'checked';
+	else
+		$cd_checked = "";
+		
+	$date = $poll_info['end_date'];
+	$date = substr($date, 0, -9);
+	$tmp_date = explode("-", $date);
+	$date = $tmp_date[1] . '/' . $tmp_date[2] . '/' . $tmp_date[0];
+	
+	$choice_info = $pollModel->getPollChoices($poll_id);
+	while($choice_row = mysql_fetch_array($choice_info))
+		$choices[] = $choice_row['choice'];
+	
+	//shows that we are editing a poll
+	$poll_editing = TRUE;
+}
+
 //form validation
-if($_SERVER['REQUEST_METHOD'] == 'POST')
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit']))
 {	
+	//shows that we are editing a poll
+	$poll_editing = $_POST['polledit'];
+	$poll_id = $_POST['pollid'];
+	
 	//poll title
 	if(isset($_POST['poll_title']))
 	{
@@ -97,6 +153,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 			$public_checked = "";
 			$private_checked = 'checked';
 			
+			//groups
 			if(isset($_POST['groups']))
 			{
 				$group_chosen = $_POST['groups'];
@@ -201,26 +258,35 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 	//input into database if there are no errors
 	if($has_error == FALSE)
 	{
-		echo $error;
 		$type = 'multiple choice';
 		$start_date = '1900-01-01 00:00:00';
 		
 		//insert into poll_info table
-		$pollModel->createPoll($poll_title, $description, $user_id, $type, $is_public, $comments_disabled, $anonymous, $start_date, $end_date);
+		if($poll_editing == false)
+			$pollModel->createPoll($poll_title, $description, $user_id, $type, $is_public, $comments_disabled, $anonymous, $start_date, $end_date);
+		else 
+			$pollModel->editPoll($poll_id, $poll_title, $description, $is_public, $comments_disabled, $anonymous, $end_date);
 		
 		//insert choices into poll_choices table
-		$poll_id = $pollModel->insertChoices($choices);
+		$poll_id = $pollModel->insertChoices($choices, $poll_id);
 		
 		//if private insert poll id into group_polls
 		if($is_public == 0)
 			$pollModel->insertGroupPoll($poll_id, $group_chosen);
 		
-		die('<meta http-equiv="REFRESH" content="0; url=index.php">');
+		//remove group from group_polls if edited to be public
+		if($poll_editing == true && $is_public == 1)
+			$pollModel->makePublic($poll_id);
+			
+		die("<meta http-equiv='REFRESH' content='0; url=viewpoll.php?pollid=$poll_id'>");
 	}
 }
 echo <<<_END
 <body onload="numRows('3')">
-<h1>Create Poll</h1>$error
+
+<!-- Title and Error -->
+<h1>Create Poll</h1>
+<span class='error'>$error</span>
 
 <!-- Start Poll Creation Form -->
 <form method='post' action='create.php'>
@@ -236,7 +302,10 @@ $groups = $userModel->userGroups($user_id);
 while($groups_row = mysql_fetch_array($groups))
 {
 	$group = $groups_row['name'];
-	echo "<option value='$group'>$group</option>";
+	if($group == $group_chosen)
+		echo "<option value='$group' selected>$group</option>";
+	else
+		echo "<option value='$group'>$group</option>";
 }
 echo <<<_END
 </select>
@@ -282,8 +351,12 @@ echo <<<_END
 <tfoot><tr><td><input type='button' value='Add Choice' id='AddChoice'></td></tr></tfoot>
 </table>
 
+<!-- hidden values for editing -->
+<input type='hidden' name='polledit' value=$poll_editing>
+<input type='hidden' name='pollid' value=$poll_id>
+
 <!-- Submit button -->
-<input type='submit' value='Submit'>
+<input type='submit' name='submit' value='Submit'>
 
 <!-- Reset button -->
 <input type='reset' value='Reset'>
@@ -298,4 +371,4 @@ echo <<<_END
 _END;
 
 ?>
-</html>
+</body></html>

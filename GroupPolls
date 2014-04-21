@@ -1,0 +1,99 @@
+<?php
+//user logs in, sees all of his/her groups, clicks on which one they want to see, then go to this page
+
+include_once 'header.php';
+$userModel = new UserModel();
+
+
+$userID = $_SESSION['userid'];
+$members = Array();
+$pollClosed = FALSE;
+
+//if link was clicked
+//display group polls
+if(isset($_GET['group']))
+{   $grp = $_GET['group'];
+	//echo $_GET['group'] . " group page"; 
+}
+
+if(($_SERVER['REQUEST_METHOD'] == 'GET'))
+{
+	//get time and date
+	$time = date("Y\-m\-d h:i:s A");
+	
+	$poll = $_GET['pollid'];
+	
+	//close poll
+	$closePoll = queryMysql("UPDATE poll_info SET end_date='$time' WHERE poll_id='$poll'");
+	$pollClosed = TRUE;
+
+}
+//$gpwd = queryMysql("SELECT * FROM groups WHERE password='$gpassword'");
+
+/*$group = queryMysql("SELECT * FROM groups WHERE password='$gpassword'");
+while($row = mysql_fetch_array($groups)){
+	$gname = $row['name'];
+}*/
+
+
+/*
+$g_mems = queryMysql("SELECT * FROM groups_members");
+$cntr = 0;
+while($g_info = mysql_fetch_array($g_mems)){
+	if ($g_info['group_id'] == $gID){  		        //if user is in the group
+		$members[$cntr] = $g_info['member_id'];		//add them to the members array
+		$cntr++;									//increment array index
+	}
+}	
+*/	
+
+//get group id
+$getID= queryMysql("SELECT group_id AND creator_id FROM groups WHERE name='$grp'");
+while ($r = mysql_fetch_array($getID)){
+	$gID = $r['group_id'];
+	//$cID = $r['creator_id'];
+}
+	
+	//get pollids from group_polls
+	$groupPollIDs = queryMysql("SELECT * FROM group_polls WHERE group_id='$gID'");
+	while ($gpolls = mysql_fetch_array($groupPollIDs)){ 	
+		$p = $gpolls['poll_id'];
+
+		//get group polls from database
+		$groupPolls = queryMysql("SELECT * FROM poll_info WHERE poll_id='$p'");
+		while ($row = mysql_fetch_array($groupPolls)){   ?>
+		
+<div style="display:table;width:60%;margin-left:auto; margin-right:auto; border-radius: 5px; background-color: white;">
+			<div style="display:table-row; background-color: #0099CC;">
+				<div style="display:table-cell; padding-top: 1em; padding-left: 1em; font-size:large;">
+				    <a href="/viewpoll.php?pollid=<?= $row['poll_id']?>"><?= $row['title']?></a>
+				</div>
+				<div style="display:table-cell"></div>
+			</div>
+			<div style="cursor:pointer;height:100%;width:100%;float:left;padding-left:1em;padding-top:1em;" id="<?= $row['poll_id']?>" class="expand">
+				<div style="float:left;width:50%;">
+					<label style="cursor:pointer;border-left: 2px solid lightgray;"><?= $row['description']?></label>
+				</div>
+				<div style="float:left;width:50%;">
+					<?if($pollModel->validPollDate($row['poll_id'])){  ?>
+						<label style="cursor:pointer;">Poll closes at: <?= $row['end_date'] ?></label>	
+					<?
+					} 
+					else{?>
+						<label style="cursor:pointer;">Poll closed: <?= $row['end_date'] ?></label>
+					<?}?>
+				</div>
+				<div>
+					
+				</div>
+			</div>
+			<div id="poll<?=$row['poll_id'] ?>" style="display:none;width:200px" class="extraInfo">
+				<label>Creator: <?=$_SESSION['name']?></label>
+			</div>
+		</div>
+		<br />
+	<?php }
+
+	}  //end outer query loop
+	?>		
+
