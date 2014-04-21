@@ -8,8 +8,8 @@ body{margin:0;
 	 background-color: white;
 	 background-image:url('EzVote.jpg');
 	 background-attachment:fixed;
-	 background-size:20%;
-	 background-position:0% 13%;}
+	 background-size:17%;
+	 background-position:0% 10%;}
 
 /*Sets the style for the links both before and after they have been visited in the header*/							  
 a.linky:link, a.linky:visited{text-decoration: none; 
@@ -86,11 +86,13 @@ a.sortLink{text-decoration: none;
 		   color: white;}
 
 /*Sets the color of the headings for the user page forms*/
-.heading{color:#0099CC;}
+.heading, h1{color:#0099CC;}
 		
 /*Sets the style for the choices section of the create.php page to match the formstyle styling*/
 #Choices{text-align: left;
 		 margin-left: 0px;}
+		 
+.checkFilters{color:#0099CC;}
 		 
 #listTable
 {
@@ -127,30 +129,25 @@ a.sortLink{text-decoration: none;
 	width:50%;
 }
 
-.filterDiv
+.ascImg
 {
-	width:65%; 
-	background: #2D3232; 
-	margin-left: auto; 
-	margin-right: auto; 
-	margin-top: 200px; 
-	padding-top: 20px; 
-	border-radius: 10px;
+	height: 15px;
 }
 
 .sortBtn
 {
-	padding-left:1em;
-	color:#0099CC;
-	background:#2D3232;
-	border:none;
-	border-radius:5px;
+	background: none repeat scroll 0 0 #2D3232;
+    border: medium none;
+    border-radius: 5px;
+    color: #0099CC;
+    padding-left: 1em;
 }
-.selected
+
+.sortBtn.selected
 {
-	padding-left:1em;
-	color:white;
-	background:#0099CC;
-	border:none;
-	border-radius:5px;
+	background: none repeat scroll 0 0 #0099CC;
+    border: medium none;
+    border-radius: 5px;
+    color: #FFFFFF;
+    padding-left: 1em;
 }
