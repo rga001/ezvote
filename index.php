@@ -129,6 +129,7 @@ _END;
 	while ($row = mysql_fetch_array($topPolls)){
 		$tmpRow = $userModel->getUserInfo($row['creator_id']);
 		$tmpCreator = mysql_fetch_array($tmpRow);
+		$tmpType = $pollModel->getPollType($row['type']);
 		
 		$end_date = substr($row['end_date'], 0, -9);
 		$tmp_date = explode('-', $end_date);
@@ -146,11 +147,19 @@ _END;
 					<label style="cursor:pointer;border-left: 2px solid lightgray;"><?= $row['description']?></label>
 				</div>
 				<div style="float:left;width:50%;">
-					<label style="cursor:pointer;">Poll closes at: <?= $end_date ?></label>
+					<label style="cursor:pointer;">Poll closes on: <?= $end_date ?></label>
 				</div>
 			</div>
 			<div id="poll<?=$row['poll_id'] ?>" style="display:none;width:200px" class="extraInfo">
 				<label>Creator: <?=$tmpCreator['firstname'].' '.$tmpCreator['lastname'] ?></label>
+				<label>Poll Start: <?=$tmpRow['start_date']?></label>
+				<label>Voting is set to <?=$tmpType?></label>
+			<?if ($tmpRow['public'] == 0){?>
+				<label>This poll is private</label>
+			<?}if ($tmpRow['comments'] == 0){?>
+				<label>Comments are disabled.</label>
+			<?}if ($tmpRow['anonymous'] == 1){?>
+				<label>Voting is anonymous</label><?}?>
 			</div>
 		</div>
 		<br />

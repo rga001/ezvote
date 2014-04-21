@@ -240,6 +240,13 @@ class PollModel{
 				 " FROM poll_comments, users WHERE poll_comments.poll_id = $poll_id AND poll_comments.user_id = users.userid";
 		return queryMysql($query);
 	}
+	
+	//get poll type
+	public function getPollType($type_id)
+	{
+		$query = "SELECT type FROM extreme_voting.poll_type WHERE type_id = $type_id";
+		return queryMysql($query);
+	}
 }
 
 ?>
