@@ -111,14 +111,14 @@ _END;
 	}
 	
 ?>
-	<div style="width:65%; background: #2D3232; margin-left: auto; margin-right: auto; margin-top: 200px; padding-top: 20px; border-radius: 10px">
+	<div class="filterDiv">
 		<div style="padding-bottom:1em;width:50%;margin: 0 auto;">
 			<h1>Browse Polls</h1>
 			<form method="post" action="index.php?sortby=end&asc=true" id="filterForm" name="sortForm">
-			<button class="sortBtn css" type="button" name="index.php?sortby=start&asc=<?=ascCheck('start')?>" style="padding-left:1em;color:#0099CC;background:#2D3232;border:none;border-radius:5px;" id="startLink <?=selected('start')?>">Poll Open</button><?=sortPic('start')?>
-			<button class="sortBtn" type="button" name="index.php?sortby=end&asc=<?=ascCheck('end')?>" style="padding-left:1em;color:#0099CC;background:#2D3232;border:none;border-radius:5px;" id="endLink <?=selected('end')?>">Poll Close</button><?=sortPic('end')?>
-			<button class="sortBtn" type="button" name="index.php?sortby=create&asc=<?=ascCheck('create')?>" style="padding-left:1em;color:#0099CC;background:#2D3232;border:none;border-radius:5px;" id="createLink <?=selected('create')?>">Created Date</button><?=sortPic('create')?>
-			<button class="sortBtn" type="button" name="index.php?sortby=pop&asc=<?=ascCheck('pop')?>" style="padding-left:1em;color:#0099CC;background:#2D3232;border:none;border-radius:5px;" id="popLink <?=selected('pop')?>">Popular Polls</button><?=sortPic('pop')?>
+			<button class="sortBtn css" type="button" name="index.php?sortby=start&asc=<?=ascCheck('start')?>" id="startLink <?=selected('start')?>">Poll Open</button><?=sortPic('start')?>
+			<button class="sortBtn" type="button" name="index.php?sortby=end&asc=<?=ascCheck('end')?>"  id="endLink <?=selected('end')?>">Poll Close</button><?=sortPic('end')?>
+			<button class="sortBtn" type="button" name="index.php?sortby=create&asc=<?=ascCheck('create')?>" id="createLink <?=selected('create')?>">Created Date</button><?=sortPic('create')?>
+			<button class="sortBtn" type="button" name="index.php?sortby=pop&asc=<?=ascCheck('pop')?>" id="popLink <?=selected('pop')?>">Popular Polls</button><?=sortPic('pop')?>
 			<br />
 				<input type="checkbox" name="filters[]" value="closed" class="checkFilters" <?=filterCheck('closed')?> />Closed Polls
 <?php if (!($user_id == -1)) {?>

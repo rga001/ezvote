@@ -126,3 +126,31 @@ a.sortLink{text-decoration: none;
 	float:left;
 	width:50%;
 }
+
+.filterDiv
+{
+	width:65%; 
+	background: #2D3232; 
+	margin-left: auto; 
+	margin-right: auto; 
+	margin-top: 200px; 
+	padding-top: 20px; 
+	border-radius: 10px;
+}
+
+.sortBtn
+{
+	padding-left:1em;
+	color:#0099CC;
+	background:#2D3232;
+	border:none;
+	border-radius:5px;
+}
+.selected
+{
+	padding-left:1em;
+	color:white;
+	background:#0099CC;
+	border:none;
+	border-radius:5px;
+}
