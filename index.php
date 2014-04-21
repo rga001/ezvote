@@ -108,7 +108,7 @@ _END;
 	
 ?>
 	<div style="width:65%; background: #2D3232; margin-left: auto; margin-right: auto; margin-top: 200px; padding-top: 20px; border-radius: 10px">
-		<div style="padding-bottom:1em;width:50%;margin: 0 auto;">
+		<div style="padding-bottom:1em;width:75%;margin: 0 auto;">
 			<h1>Browse Polls</h1>
 			<form method="post" action="index.php?sortby=end&asc=true" id="filterForm" name="sortForm">
 			<button class="sortBtn <?=selected('start')?>" type="button" name="index.php?sortby=start&asc=<?=ascCheck('start')?>"  id="startLink">Poll Open</button><?=sortPic('start')?>

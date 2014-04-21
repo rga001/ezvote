@@ -32,10 +32,10 @@ class PollModel{
 			$orderby .= ' ASC';
 		else
 			$orderby .= ' DESC';
-<<<<<<< HEAD
-		$query = "SELECT p.poll_id, COUNT(DISTINCT(v.user_id)) FROM extreme_voting.poll_info p LEFT OUTER JOIN extreme_voting.poll_vote v ON v.poll_id = p.poll_id WHERE (p.public = 1 OR p.creator_id = $user_id) GROUP BY p.poll_id ";
-		echo $query;
-=======
+
+		//$query = "SELECT p.poll_id, COUNT(DISTINCT(v.user_id)) FROM extreme_voting.poll_info p LEFT OUTER JOIN extreme_voting.poll_vote v ON v.poll_id = p.poll_id WHERE (p.public = 1 OR p.creator_id = $user_id) GROUP BY p.poll_id ";
+		//echo $query;
+
 		$limit = ($page - 1) * 10;
 		$query = "SELECT p.*, COUNT(DISTINCT(v.user_id)) as votes ".
 					"FROM extreme_voting.poll_info p ".
@@ -58,7 +58,7 @@ class PollModel{
 		$query .= $orderby;
 		$query .= " LIMIT $limit, 10";
 		//echo $query;
->>>>>>> ezvote/master
+
 		return queryMysql($query);
 	}
 	
