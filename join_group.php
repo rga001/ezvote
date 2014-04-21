@@ -25,9 +25,10 @@ $userModel = new UserModel();
 		  $password = $group_info['password'];
 		  $creator = $group_info['creator_id'];
 		  $date = $group_info['created_date'];
+		  $salt = $group_info['salt'];
 		}
 		
-
+		$gpass = hash('sha256', $gpass + $salt);
 		//echo $gname . " " . $group . " " . $gpass . " " . $password;
 		
 		//if name and password match group name and password then allow to join group

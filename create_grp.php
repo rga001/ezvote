@@ -5,6 +5,16 @@
 	$error = $groupname = $password = $password2 = "";
 	$has_error = FALSE;
 	
+	//generate random salt
+	function generateSalt(){
+		$salt = '';
+		$seed = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		for($i = 0; $i < 10; $i++){
+			$salt .= $seed[rand(0, strlen($seed) - 1)];
+		}
+		return $salt;
+	}
+	
 	//validate form
 	if($_SERVER['REQUEST_METHOD'] == 'POST')
 	{	
@@ -14,6 +24,8 @@
 		$creation_date = date("Y\-m\-d h:i:s A");
 		$user = $_SESSION['username'];
 		$user_id = $_SESSION['userid'];
+		$salt = generateSalt();
+		$hashedPW = hash('sha256', $gpass + $salt);
 		
 		$groups = queryMysql("SELECT name FROM groups");
 		$names = Array();
@@ -49,7 +61,7 @@
 			$has_error = TRUE;
 		}
 		else   //insert values into table
-			queryMysql("INSERT INTO groups (name, password, creator_id, created_date) VALUES('$gname', '$gpass', '$user_id', '$creation_date')");
+			queryMysql("INSERT INTO groups (name, password, creator_id, created_date, salt) VALUES('$gname', '$hashedPW', '$user_id', '$creation_date', '$salt')");
 		
 		//redirect home (until group page goes up)
 		die('<meta http-equiv="REFRESH" content="0; url=index.php">');
