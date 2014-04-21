@@ -64,8 +64,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submitcomment']))
 		$comment_error = "ERROR: No comment written<br>";
 }
 
+//HTML stuff
+
 //poll title and error
-echo "<h1>".htmlspecialchars($poll['title'])."</h1>";
+echo "<div class='formstyle'>";
+echo "<h1 class='heading'>".htmlspecialchars($poll['title'])."</h1>";
 echo "<span class='error'>$error</span>";
 
 //creator - username if public, real name if private 
@@ -132,6 +135,7 @@ if(!($userModel->userIsLoggedIn()) || ($pollModel->votedAlready($poll_id, $user_
 	}
 	echo "</table>";
 }
+
 //poll choices to vote from if you haven't voted yet
 else 
 {
@@ -141,7 +145,7 @@ else
 	while($choice_row = mysql_fetch_array($choice_info))
 	{
 		$choice = htmlspecialchars($choice_row['choice']);
-		echo "<tr><td><input type='radio' name='choice' value=$choice required>$choice</td></tr>";
+		echo "<tr><td><input type='radio' name='choice' value='$choice' required>$choice</td></tr>";
 	}
 	echo "</tbody><tfoot>";
 	echo "<tr><td colspan='2'><input type='submit' name='submitvote' value='Vote'></form>";
@@ -195,7 +199,7 @@ if($poll['comments'] == 1)
 		echo "<br>";
 		echo "$comment_error";
 		echo "<form method='post' action='viewpoll.php?pollid=$poll_id'>";
-		echo "<textarea name='comment' rows='3' cols='50' maxlength='300' required></textarea><br>";
+		echo "<textarea name='comment' rows='3' cols='40' maxlength='300' required></textarea><br>";
 		echo "<input type='submit' name='submitcomment' value='Submit Comment'></form>";
 	}
 	
@@ -205,10 +209,11 @@ if($poll['comments'] == 1)
 	$comments_user = "";
 	while($row = mysql_fetch_array($poll_comments))
 	{
-		if($poll['anonymous'] == 1)
+		if($poll['public'] == 1)
 			$comments_user = $row['username'];
 		else
 			$comments_user = $row['firstname'] . " " . $row['lastname'];
 		echo htmlspecialchars($comments_user) . ": " . htmlspecialchars($row['comment']) . "<br>";
 	}
 }
+echo "<br><br></div>";

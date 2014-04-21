@@ -30,9 +30,9 @@ $filters = $_REQUEST['filters'];
 		$('.expand').click(function(){
 			var id = $(this).attr("id");
 			if ($("#poll"+id).is(':visible')){
-				$("#poll"+id).slideUp();
+				$("#poll"+id).slideUp(0);
 			}else{
-				$("#poll"+id).slideDown();
+				$("#poll"+id).slideDown(0);
 			}
 		});
 		$('.sortBtn').click(function(){
@@ -111,8 +111,9 @@ _END;
 	}
 	
 ?>
-	<div style="width:80%; background: white;margin-left: auto; margin-right: auto;">
+	<div style="width:65%; background: #2D3232; margin-left: auto; margin-right: auto; margin-top: 200px; padding-top: 20px; border-radius: 10px">
 		<div style="padding-bottom:1em;width:50%;margin: 0 auto;">
+			<h1>Browse Polls</h1>
 			<form method="post" action="index.php?sortby=end&asc=true" id="filterForm" name="sortForm">
 			<button class="sortBtn css" type="button" name="index.php?sortby=start&asc=<?=ascCheck('start')?>" style="padding-left:1em;color:#0099CC;background:#2D3232;border:none;border-radius:5px;" id="startLink <?=selected('start')?>">Poll Open</button><?=sortPic('start')?>
 			<button class="sortBtn" type="button" name="index.php?sortby=end&asc=<?=ascCheck('end')?>" style="padding-left:1em;color:#0099CC;background:#2D3232;border:none;border-radius:5px;" id="endLink <?=selected('end')?>">Poll Close</button><?=sortPic('end')?>
@@ -132,8 +133,12 @@ _END;
 	while ($row = mysql_fetch_array($topPolls)){
 		$tmpRow = $userModel->getUserInfo($row['creator_id']);
 		$tmpCreator = mysql_fetch_array($tmpRow);
+		
+		$end_date = substr($row['end_date'], 0, -9);
+		$tmp_date = explode('-', $end_date);
+		$end_date = $tmp_date[1] . "/" . $tmp_date[2] . "/" . $tmp_date[0];
 ?>
-		<div style="display:table;width:75%;margin-left:auto; margin-right:auto; border: 2px solid gray; border-radius: 5px;">
+		<div style="display:table;width:75%;margin-left:auto; margin-right:auto; border: 2px solid gray; border-radius: 5px; background-color:white;">
 			<div style="display:table-row; background-color: lightblue;">
 				<div style="display:table-cell; padding-top: 1em; padding-left: 1em; font-size:large; ">
 					<a href="/viewpoll.php?pollid=<?= $row['poll_id']?>"><?= $row['title']?></a>
@@ -145,7 +150,7 @@ _END;
 					<label style="cursor:pointer;border-left: 2px solid lightgray;"><?= $row['description']?></label>
 				</div>
 				<div style="float:left;width:50%;">
-					<label style="cursor:pointer;">Poll closes at: <?= $row['end_date'] ?></label>
+					<label style="cursor:pointer;">Poll closes at: <?= $end_date ?></label>
 				</div>
 			</div>
 			<div id="poll<?=$row['poll_id'] ?>" style="display:none;width:200px" class="extraInfo">
