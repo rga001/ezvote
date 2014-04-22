@@ -49,14 +49,14 @@ $filters = $_REQUEST['filters'];
 					url = $(this).attr('name');
 				}
 			});
+			if(url==''){
+				url = "index.php";
+			}
 			$('.checkFilters').each(function(){
 				if ($(this).is(':checked')){
 					url+= "&filters[]=" + $(this).val();
 				}
 			});
-			if(url==''){
-				url = "index.php";
-			}
 			$('#filterForm').prop('action', url);
 			$('#filterForm').submit();
 		});
