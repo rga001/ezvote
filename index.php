@@ -50,7 +50,7 @@ $filters = $_REQUEST['filters'];
 				}
 			});
 			if(url==''){
-				url = "index.php";
+				url = "index.php?";
 			}
 			$('.checkFilters').each(function(){
 				if ($(this).is(':checked')){
