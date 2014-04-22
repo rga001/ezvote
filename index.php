@@ -32,6 +32,7 @@ $filters = $_REQUEST['filters'];
 			if ($("#poll"+id).is(':visible')){
 				$("#poll"+id).slideUp(0);
 			}else{
+				$("#poll"+id).prop("height", "auto");
 				$("#poll"+id).slideDown(0);
 			}
 		});
@@ -70,7 +71,7 @@ _END;
 	$pollModel = new PollModel();
 	$userModel = new UserModel();
 	$topPolls = $pollModel->getTopPolls($user_id, $sortby, $page, $asc, $filters);
-	$count = 0;
+	$count = 1;
 	
 	function sortPic($check){
 		global $sortby, $asc;
@@ -127,9 +128,11 @@ _END;
 <?php
 
 	while ($row = mysql_fetch_array($topPolls)){
+		$count++;
 		$tmpRow = $userModel->getUserInfo($row['creator_id']);
 		$tmpCreator = mysql_fetch_array($tmpRow);
-		$tmpType = $pollModel->getPollType($row['type']);
+		$tmpTypeRow = $pollModel->getPollType($row['type']);
+		$tmpType = mysql_fetch_array($tmpTypeRow);
 		
 		$end_date = substr($row['end_date'], 0, -9);
 		$tmp_date = explode('-', $end_date);
@@ -150,16 +153,28 @@ _END;
 					<label style="cursor:pointer;">Poll closes on: <?= $end_date ?></label>
 				</div>
 			</div>
-			<div id="poll<?=$row['poll_id'] ?>" style="display:none;width:200px" class="extraInfo">
-				<label>Creator: <?=$tmpCreator['firstname'].' '.$tmpCreator['lastname'] ?></label>
-				<label>Poll Start: <?=$tmpRow['start_date']?></label>
-				<label>Voting is set to <?=$tmpType?></label>
-			<?if ($tmpRow['public'] == 0){?>
-				<label>This poll is private</label>
-			<?}if ($tmpRow['comments'] == 0){?>
-				<label>Comments are disabled.</label>
-			<?}if ($tmpRow['anonymous'] == 1){?>
-				<label>Voting is anonymous</label><?}?>
+			<div id="poll<?=$row['poll_id'] ?>" style="display:none;width:50%;height:auto" class="extraInfo">
+				<div style="padding-top:3em;padding-left:1em;">
+					<label>Creator: <?=$tmpCreator['firstname'].' '.$tmpCreator['lastname'] ?></label>
+				</div>
+				<div style="padding-left:1em">
+					<label>Poll Start: <?=$row['start_date']?></label>
+				</div>
+				<div style="padding-left:1em">
+					<label>Voting is set to <?=$tmpType['type']?></label>
+				</div>
+			<?if ($row['public'] == 0){?>
+				<div style="padding-left:1em">
+					<label>This poll is private</label>
+				</div>
+			<?}if ($row['comments'] == 0){?>
+				<div style="padding-left:1em">
+					<label>Comments are disabled.</label>
+				</div>
+			<?}if ($row['anonymous'] == 1){?>
+				<div style="padding-left:1em">
+					<label>Voting is anonymous</label>
+				</div><?}?>				
 			</div>
 		</div>
 		<br />
@@ -167,15 +182,17 @@ _END;
 	//if page > 1 show prev
 	//show next
 	//need to change this to get a pollcount or something so you cant click next forever
+?>
+	<div style="padding-bottom:1em">
+<?
 	if ($page > 1){
 ?>
-		<div>
-			<a href="/index.php?sortby=<?=$sortby?>&asc=<?=$asc?>&page=<?=$page-1?>">Prev</a>
-		</div>
-<?php } ?>
-		<div>
-			<a href="/index.php?sortby=<?=$sortby?>&asc=<?=$asc?>&page=<?=$page+1?>">Next</a>
-		</div>
+		<a class="linky" href="/index.php?sortby=<?=$sortby?>&asc=<?=$asc?>&page=<?=$page-1?>">Prev</a>	
+<?php } if($count > 10){ ?>		
+		<a class="linky" href="/index.php?sortby=<?=$sortby?>&asc=<?=$asc?>&page=<?=$page+1?>">Next</a>
+<? } ?>
+	</div>
+	
 	</div>
 	
 	
