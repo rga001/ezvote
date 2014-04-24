@@ -12,18 +12,17 @@ $pollClosed = FALSE;
 
 
 //echo $poll;
-if(($_SERVER['REQUEST_METHOD'] == 'GET'))
+/*if(($_SERVER['REQUEST_METHOD'] == 'GET'))
 {
 	//get time and date
 	$time = date("Y\-m\-d h:i:s A");
-	//echo $time;
-	
+
+	//get pollid from query string
 	$poll = $_GET['pollid'];
-	
+
 	//close poll
 	$closePoll = queryMysql("UPDATE poll_info SET end_date='$time' WHERE poll_id='$poll'");
 	$pollClosed = TRUE;
-	//$p = $poll;
 
 }
 
@@ -49,16 +48,21 @@ echo "groups: ";
 foreach($userGroups as $z) 
 {
 	//echo $userGroupNames[$z] . " ";
-	echo "<a href=GroupPolls.php?group={$userGroupNames[$z]}>{$userGroupNames[$z]}</a>";
+	echo "<a href=GroupPolls.php?group={$userGroupNames[$z]}>{$userGroupNames[$z]}</a>" . " ";
 } 
 
- //echo "<h1>$name's Polls</h1>";
+ */echo "hi";
 
-
+		echo "<div style='width:65%; background: #2D3232; margin-left: 300px; margin-right: auto; margin-top: 200px; padding-top: 20px; border-radius: 10px'>";
 		$userPolls = queryMysql("SELECT * FROM poll_info WHERE creator_id='$userID'");
-		while ($row = mysql_fetch_array($userPolls)){   ?>
+		echo "<h1 style='padding-left:80px;'> Polls </h1>";
+		while ($row = mysql_fetch_array($userPolls)){  
+
+
+		?>
 		
-<div style="display:table;width:50%;margin-left:auto; margin-right:auto; border-radius: 5px; background-color: white;">
+<!--<div style="background-color: #2D3232; padding-top: 20px; margin-top: 150px; margin-left: 250px; width: 800px; border-radius: 10px">-->
+<div style="display:table;width:80%; margin-left: auto; margin-right:auto; border-radius: 5px; background-color: white;">
 			<div style="display:table-row; background-color: #0099CC;">
 				<div style="display:table-cell; padding-top: 1em; padding-left: 1em; font-size:large;">
 				    <a href="/viewpoll.php?pollid=<?= $row['poll_id']?>"><?= $row['title']?></a>
@@ -69,22 +73,26 @@ foreach($userGroups as $z)
 				<div style="float:left;width:50%;">
 					<label style="cursor:pointer;border-left: 2px solid lightgray;"><?= $row['description']?></label>
 				</div>
+
 				<div style="float:left;width:50%;">
+
+				<? if($pollModel->validPollDate($row['poll_id'])){ ?>
 					<label style="cursor:pointer;">Poll closes at: <?= $row['end_date'] ?></label>		
 					<form method="get" action="UserPolls.php">
-					<? if(($pollClosed == 1)&& ($poll != $row['poll_id'])) { ?>
 						<input type="submit" value="Close Poll"> 
-					<? }	?>
-					<input type="hidden" name="pollid" value="<?echo $row['poll_id']?>">
-					</form>		
+						<input type="hidden" name="pollid" value="<?echo $row['poll_id']?>">
+					</form>	
+				<? }	
+				   else{	?>
+				     <label style="cursor:pointer;">Poll closed: <?= $row['end_date'] ?></label>
+				 <?}?>	
 				</div>
-				<div>
-					
-				</div>
+			
 			</div>
 			<div id="poll<?=$row['poll_id'] ?>" style="display:none;width:200px" class="extraInfo">
 				<label>Creator: <?=$_SESSION['name']?></label>
 			</div>
 		</div>
 		<br />
-	<?php } ?>		
+		
+	<? } ?> </div>

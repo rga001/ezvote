@@ -108,7 +108,7 @@ _END;
 	}
 	
 ?>
-	<div style="width:65%; background: #2D3232; margin-left: auto; margin-right: auto; margin-top: 200px; padding-top: 20px; border-radius: 10px">
+	<div style="width:65%; background: #2D3232; margin-left: 300px; margin-right: auto; margin-top: 200px; padding-top: 20px; border-radius: 10px">
 		<div style="padding-bottom:1em;width:75%;margin: 0 auto;">
 			<h1>Browse Polls</h1>
 			<form method="post" action="index.php?sortby=end&asc=true" id="filterForm" name="sortForm">
@@ -135,8 +135,17 @@ _END;
 		$tmpType = mysql_fetch_array($tmpTypeRow);
 		
 		$end_date = substr($row['end_date'], 0, -9);
-		$tmp_date = explode('-', $end_date);
-		$end_date = $tmp_date[1] . "/" . $tmp_date[2] . "/" . $tmp_date[0];
+		$tmp_end_date = explode('-', $end_date);
+		$end_date = $tmp_end_date[1] . "/" . $tmp_end_date[2] . "/" . $tmp_end_date[0];
+		
+		$start_date = substr($row['create_date'], 0, -9);
+		$tmp_start_date = explode('-', $start_date);
+		$start_date = $tmp_start_date[1] . "/" . $tmp_start_date[2] . "/" . $tmp_start_date[0];
+		
+		if($row['public'] == 1)
+			$creator = $tmpCreator['username'];
+		else
+			$creator = $tmpCreator['firstname'].' '.$tmpCreator['lastname'];
 ?>
 		<div style="display:table;width:75%;margin-left:auto; margin-right:auto; border: 2px solid gray; border-radius: 5px; background-color:white;">
 			<div style="display:table-row; background-color: lightblue;">
@@ -155,14 +164,14 @@ _END;
 			</div>
 			<div id="poll<?=$row['poll_id'] ?>" style="display:none;width:50%;height:auto" class="extraInfo">
 				<div style="padding-top:3em;padding-left:1em;">
-					<label>Creator: <?=$tmpCreator['firstname'].' '.$tmpCreator['lastname'] ?></label>
+					<label>Creator: <?=$creator ?></label>
 				</div>
 				<div style="padding-left:1em">
-					<label>Poll Start: <?=$row['start_date']?></label>
+					<label>Poll Start: <?=$start_date?></label>
 				</div>
-				<div style="padding-left:1em">
+				<!-- ><div style="padding-left:1em">
 					<label>Voting is set to <?=$tmpType['type']?></label>
-				</div>
+				</div>-->
 			<?if ($row['public'] == 0){?>
 				<div style="padding-left:1em">
 					<label>This poll is private</label>
