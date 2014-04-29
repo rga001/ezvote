@@ -30,10 +30,10 @@ $filters = $_REQUEST['filters'];
 		$('.expand').click(function(){
 			var id = $(this).attr("id");
 			if ($("#poll"+id).is(':visible')){
-				$("#poll"+id).slideUp(0);
+				$("#poll"+id).hide();
 			}else{
-				$("#poll"+id).prop("height", "auto");
-				$("#poll"+id).slideDown(0);
+				$("#poll"+id).css("height","");
+				$("#poll"+id).show();
 			}
 		});
 		$('.sortBtn').click(function(){
@@ -112,7 +112,7 @@ _END;
 		<div style="padding-bottom:1em;width:75%;margin: 0 auto;">
 			<h1>Browse Polls</h1>
 			<form method="post" action="index.php?sortby=end&asc=true" id="filterForm" name="sortForm">
-			<button class="sortBtn <?=selected('start')?>" type="button" name="index.php?sortby=start&asc=<?=ascCheck('start')?>"  id="startLink">Poll Open</button><?=sortPic('start')?>
+			<?/*<button class="sortBtn <?=selected('start')?>" type="button" name="index.php?sortby=start&asc=<?=ascCheck('start')?>"  id="startLink">Poll Open</button><?=sortPic('start')?> */?>
 			<button class="sortBtn <?=selected('end')?>" type="button" name="index.php?sortby=end&asc=<?=ascCheck('end')?>"  id="endLink">Poll Close</button><?=sortPic('end')?>
 			<button class="sortBtn <?=selected('create')?>" type="button" name="index.php?sortby=create&asc=<?=ascCheck('create')?>" id="createLink">Created Date</button><?=sortPic('create')?>
 			<button class="sortBtn <?=selected('pop')?>" type="button" name="index.php?sortby=pop&asc=<?=ascCheck('pop')?>"  id="popLink">Popular Polls</button><?=sortPic('pop')?>
@@ -128,6 +128,7 @@ _END;
 <?php
 
 	while ($row = mysql_fetch_array($topPolls)){
+	try{
 		$count++;
 		$tmpRow = $userModel->getUserInfo($row['creator_id']);
 		$tmpCreator = mysql_fetch_array($tmpRow);
@@ -141,7 +142,10 @@ _END;
 		$start_date = substr($row['create_date'], 0, -9);
 		$tmp_start_date = explode('-', $start_date);
 		$start_date = $tmp_start_date[1] . "/" . $tmp_start_date[2] . "/" . $tmp_start_date[0];
-		
+	}
+	catch(Exception $e){
+		writeLog($e->getMessage(), $user_id);
+	}	
 		if($row['public'] == 1)
 			$creator = $tmpCreator['username'];
 		else
@@ -162,8 +166,8 @@ _END;
 					<label style="cursor:pointer;">Poll closes on: <?= $end_date ?></label>
 				</div>
 			</div>
-			<div id="poll<?=$row['poll_id'] ?>" style="display:none;width:50%;height:auto" class="extraInfo">
-				<div style="padding-top:3em;padding-left:1em;">
+			<div id="poll<?=$row['poll_id'] ?>" style="display:none;height:auto;overflow:auto;" class="extraInfo">
+				<div style="padding-top:.5em;padding-left:1em;">
 					<label>Creator: <?=$creator ?></label>
 				</div>
 				<div style="padding-left:1em">

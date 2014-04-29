@@ -7,6 +7,13 @@ include_once 'database.php';
 include_once 'UserModel.php';
 include_once 'PollModel.php';
 
+function writeLog($msg, $id='-1'){
+	if ($id != '-1')
+		$msg .= "<br>" . $id;
+	$msg .= "<br>"
+	error_log(date("Y-m-d") . "<br>" . $msg, 3, "/var/www/error.log");
+}
+
 $userModel = new UserModel();
 
 echo <<<_END

@@ -21,8 +21,8 @@ class PollModel{
 				$orderby = " ORDER BY start_date "; break;
 			case 'end':
 				$orderby = " ORDER BY end_date "; break;
-			case 'created':
-				$orderby = " ORDER BY created_date "; break;
+			case 'create':
+				$orderby = " ORDER BY create_date "; break;
 			case 'pop':
 				$orderby = " ORDER BY votes "; break;
 			default:
@@ -54,6 +54,9 @@ class PollModel{
 			else{
 				$query .= " HAVING (COUNT(gm.member_id = $user_id) > 0)";
 			}
+		}
+		else if($onlyVoted == 'true'){
+			$query.= " HAVING (SUM(v.user_id = $user_id) > 0)";
 		}
 		$query .= $orderby;
 		$query .= " LIMIT $limit, 10";
@@ -177,13 +180,13 @@ class PollModel{
 	//find out if poll date has ended yet
 	public function validPollDate($poll_id)
 	{
-		$query = "SELECT start_date, end_date FROM poll_info WHERE poll_id = $poll_id";
+		$query = "SELECT end_date FROM poll_info WHERE poll_id = $poll_id";
 		$poll = mysql_fetch_array(queryMysql($query));
-		$pollEndDate = substr($poll['end_date'], 0, -9);
-		if(new DateTime() > new DateTime($pollEndDate))
-			return false;
-		else
+		$end_date = new DateTime($poll['end_date']);
+		if(new DateTime() < $end_date)
 			return true;
+		else 
+			return false;
 	}
 	
 	//return everyone's real name that voted a certain choice on a poll
