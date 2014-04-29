@@ -1,7 +1,10 @@
 <?php
 
 include_once 'header.php';
-$userModel = new UserModel();
+
+//redirect to index.php if user is not logged in
+if(!($userModel->userIsLoggedIn()))
+	die('<meta http-equiv="REFRESH" content="0; url=index.php">');
 	
 	$error = $groupname = $password = $password2 = "";
 	$has_error = FALSE;
@@ -15,9 +18,9 @@ $userModel = new UserModel();
 	{
 		$gname = $_POST['gn'];
 		$gpass = $_POST['gpassword'];
-		
-	    //
-		$grp = queryMysql("SELECT * FROM groups WHERE name='$gname'"); //group_id AND name AND password
+		$inGroup = FALSE;
+	    
+		$grp = queryMysql("SELECT * FROM groups WHERE name='$gname'");
 		while($group_info = mysql_fetch_array($grp))
 		{
 		  $gid = $group_info['group_id'];
@@ -25,11 +28,22 @@ $userModel = new UserModel();
 		  $password = $group_info['password'];
 		  $creator = $group_info['creator_id'];
 		  $date = $group_info['created_date'];
-		  $salt = $group_info['salt'];
 		}
 		
-		$gpass = hash('sha256', $gpass + $salt);
-		//echo $gname . " " . $group . " " . $gpass . " " . $password;
+		//get group members data and make sure user isn't in the group already
+		$gMembers = queryMysql("SELECT * FROM group_members");
+		while($row = mysql_fetch_array($gMembers))
+		{
+			$grpID = $row['group_id'];
+			$memID = $row['member_id'];
+			
+			if(($grpID == $gid) && ($memID == $user_id))
+			{
+				$inGroup = TRUE;
+			}	
+		}
+		
+
 		
 		//if name and password match group name and password then allow to join group
 		if(($gname != $group) || ($gpass != $password))
@@ -42,18 +56,24 @@ $userModel = new UserModel();
 			$error .= "Please enter group name and password<br>";
 			$has_error = TRUE;
 		}
+		elseif($inGroup == TRUE)
+		{
+			$error .= "You're already in this group<br>";
+			$has_error = TRUE;
+		}
 		else
 		{
 			queryMysql("INSERT INTO group_members (group_id, member_id) VALUES('$gid', '$user_id')");
+			//redirect to home (until group page is up)
+			die('<meta http-equiv="REFRESH" content="0; url=index.php">');
 		}
 		
-		//redirect to home (until group page is up)
-		die('<meta http-equiv="REFRESH" content="0; url=index.php">');
+		
 	}
 
 echo <<<_END
 <div class="formstyle">
-<h1 class="heading">Join Group</h1>$error
+<h1 class="heading">Join Group</h1><span class='error'>$error</span>
 
 <head>
 <script>
@@ -83,7 +103,7 @@ echo <<<_END
 <table>
 	<tbody> 
 		<tr><td>Group Name: </td><td><input type='gn' maxlength='254' name='gn' id='gn' value='$gn' required></td></tr>
-		<tr><td>Group password: </td><td><input type='password' maxlength='16' name='gpassword' id='pw' required></td></tr>
+		<tr><td>Group Password: </td><td><input type='password' maxlength='16' name='gpassword' id='pw' required></td></tr>
 	</tbody>
 	<tfoot>
 		<tr><td><input type='submit' value='Join Group'></td></tr>

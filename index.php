@@ -113,8 +113,8 @@ _END;
 			<h1>Browse Polls</h1>
 			<form method="post" action="index.php?sortby=end&asc=true" id="filterForm" name="sortForm">
 			<?/*<button class="sortBtn <?=selected('start')?>" type="button" name="index.php?sortby=start&asc=<?=ascCheck('start')?>"  id="startLink">Poll Open</button><?=sortPic('start')?> */?>
-			<button class="sortBtn <?=selected('end')?>" type="button" name="index.php?sortby=end&asc=<?=ascCheck('end')?>"  id="endLink">Poll Close</button><?=sortPic('end')?>
-			<button class="sortBtn <?=selected('create')?>" type="button" name="index.php?sortby=create&asc=<?=ascCheck('create')?>" id="createLink">Created Date</button><?=sortPic('create')?>
+			<button class="sortBtn <?=selected('create')?>" type="button" name="index.php?sortby=create&asc=<?=ascCheck('create')?>" id="createLink">Start Date</button><?=sortPic('create')?>
+			<button class="sortBtn <?=selected('end')?>" type="button" name="index.php?sortby=end&asc=<?=ascCheck('end')?>"  id="endLink">End Date</button><?=sortPic('end')?>
 			<button class="sortBtn <?=selected('pop')?>" type="button" name="index.php?sortby=pop&asc=<?=ascCheck('pop')?>"  id="popLink">Popular Polls</button><?=sortPic('pop')?>
 			<br />
 				<input type="checkbox" name="filters[]" value="closed" class="checkFilters" <?=filterCheck('closed')?> /><label style="color:#0099CC">Closed Polls</label>
@@ -163,7 +163,12 @@ _END;
 					<label style="cursor:pointer;border-left: 2px solid lightgray;"><?= $row['description']?></label>
 				</div>
 				<div style="float:left;width:50%;">
-					<label style="cursor:pointer;">Poll closes on: <?= $end_date ?></label>
+					<? if($pollModel->validPollDate($row['poll_id'])){ ?>
+					<label style="cursor:pointer;">Poll closes at: <?= $end_date ?></label>		
+					<? }	
+					   else{	?>
+					     <label style="cursor:pointer;">Poll closed on: <?= $end_date ?></label>
+					 <?}?>	
 				</div>
 			</div>
 			<div id="poll<?=$row['poll_id'] ?>" style="display:none;height:auto;overflow:auto;" class="extraInfo">

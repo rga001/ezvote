@@ -3,6 +3,10 @@
 	include_once 'header.php';
 	$userModel = new UserModel();
 	
+	//redirect to index.php if user is not logged in
+	if(!($userModel->userIsLoggedIn()))
+		die('<meta http-equiv="REFRESH" content="0; url=index.php">');
+	
 	$error = $email = $firstname = $lastname = $username = $password = $password2 = "";
 	$has_error = FALSE;
 
@@ -54,7 +58,8 @@
 	//account info and change password form
 	
 	echo <<<_END
-	<h1>Acount Information</h1>$error
+	<div class="formstyle">
+	<h1 class="heading">Acount Information</h1>$error
 
 	<head>
 	<script>
@@ -92,16 +97,17 @@
 			<tr><td>Last Name:</td><td>$ln</td></tr>
 			<tr><td>Username:</td><td>$un</td></tr>
 			<tr></tr>
-			<tr><td>Change password:<td><input type='password' maxlength='16' name='password' id='pw' required></td></tr>
-			<tr><td>Confirm password change: </td><td><input type='password' maxlength='16' name='password2' id='pw2' required></td></tr>
+			<tr><td>Change Password:<td><input type='password' maxlength='16' name='password' id='pw' required></td></tr>
+			<tr><td>Confirm Password Change: </td><td><input type='password' maxlength='16' name='password2' id='pw2' required></td></tr>
 		</tbody>
 		<tfoot>
 			<tr><td><input type='submit' value='Change Password'></td></tr>
 		</tfoot>
 	</table>
-	</form>
+	</form><br><br>
 
 	</body>
 	</html>
+	</div>
 _END;
 ?>

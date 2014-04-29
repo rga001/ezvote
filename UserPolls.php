@@ -4,6 +4,10 @@ include_once 'header.php';
 $userModel = new UserModel();
 $pollModel = new PollModel();
 
+//redirect to index.php if user is not logged in
+if(!($userModel->userIsLoggedIn()))
+	die('<meta http-equiv="REFRESH" content="0; url=index.php">');
+
 $userID = $_SESSION['userid'];
 $name = $_SESSION['name'];
 $userGroups = Array();
@@ -117,7 +121,7 @@ if(($_SERVER['REQUEST_METHOD'] == 'GET'))
 					</form>	
 				<? }	
 				   else{	?>
-				     <label style="cursor:pointer;">Poll closed: <?= $end_date ?></label>
+				     <label style="cursor:pointer;">Poll closed on: <?= $end_date ?></label>
 				 <?}?>	
 				</div>
 			

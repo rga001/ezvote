@@ -6,7 +6,7 @@ $error = $username = $password = "";
 $loggedIn = false;
 
 //log in user validation
-if($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['username1']) || isset($_POST['password1'])))
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login']))
 {
 	$username = $_POST['username1'];
 	$password = $_POST['password1'];
@@ -43,7 +43,7 @@ if(!($userModel->userIsLoggedIn()))
 				<tr><td>Username</td><td>Password</td></tr>
 				<td><input type='text' maxlength='254' name='username1' value='$username' required></td>
 				<td><input type='password' maxlength='16' name='password1' required></td>
-				<td><input type='submit' value='Log In'></td></tr>
+				<td><input type='submit' name='login' value='Log In'></td></tr>
 			</tbody>
 			<tfoot>
 				<tr><td colspan=2><span class='error'>$error</span></td></tr>

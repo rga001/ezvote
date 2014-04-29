@@ -2,18 +2,12 @@
 
 	include_once 'header.php';
 	
+	//redirect to index.php if user is not logged in
+	if(!($userModel->userIsLoggedIn()))
+		die('<meta http-equiv="REFRESH" content="0; url=index.php">');
+	
 	$error = $groupname = $password = $password2 = "";
 	$has_error = FALSE;
-	
-	//generate random salt
-	function generateSalt(){
-		$salt = '';
-		$seed = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		for($i = 0; $i < 10; $i++){
-			$salt .= $seed[rand(0, strlen($seed) - 1)];
-		}
-		return $salt;
-	}
 	
 	//validate form
 	if($_SERVER['REQUEST_METHOD'] == 'POST')
@@ -24,8 +18,6 @@
 		$creation_date = date("Y\-m\-d h:i:s A");
 		$user = $_SESSION['username'];
 		$user_id = $_SESSION['userid'];
-		$salt = generateSalt();
-		$hashedPW = hash('sha256', $gpass + $salt);
 		
 		$groups = queryMysql("SELECT name FROM groups");
 		$names = Array();
@@ -43,6 +35,7 @@
 			{
 			    $name_taken = TRUE;
 			}	
+				
 		}
 
 		if($gpass != $gpass2)
@@ -60,11 +53,19 @@
 			$error .= "Group name taken<br>";
 			$has_error = TRUE;
 		}
-		else   //insert values into table
-			queryMysql("INSERT INTO groups (name, password, creator_id, created_date, salt) VALUES('$gname', '$hashedPW', '$user_id', '$creation_date', '$salt')");
+		else {  //insert values into groups and group_members
+			queryMysql("INSERT INTO groups (name, password, creator_id, created_date) VALUES('$gname', '$gpass', '$user_id', '$creation_date')");
+			
+			$gID = queryMysql("SELECT group_id FROM groups");
+			while($row= mysql_fetch_array($gID))
+				$grpID = $row['group_id'];
+			
+			queryMysql("INSERT INTO group_members (group_id, member_id) VALUES('$grpID', '$user_id')");
+			
+			//redirect home (until group page goes up)
+			die('<meta http-equiv="REFRESH" content="0; url=index.php">');
+		}	
 		
-		//redirect home (until group page goes up)
-		die('<meta http-equiv="REFRESH" content="0; url=index.php">');
 	}
 
 
@@ -72,7 +73,9 @@
 
 echo <<<_END
 <div class="formstyle">
-<h1 class="heading">Create Group</h1>$error
+<h1 class="heading">Create Group</h1>
+<span class='error'>$error</span>
+
 
 <head>
 <script>
@@ -114,18 +117,19 @@ echo <<<_END
 <table>
 	<tbody> 
 		<tr><td>Group Name: </td><td><input type='gn' maxlength='254' name='gn' id='gn' value='$gn' required></td></tr>
-		<tr><td>Group password: </td><td><input type='password' maxlength='16' name='gpassword' id='pw' required></td></tr>
-		<tr><td>Confirm group password: </td><td><input type='password' maxlength='16' name='gpassword2' id='pw2' required></td></tr>
+		<tr><td>Group Password: </td><td><input type='password' maxlength='16' name='gpassword' id='pw' required></td></tr>
+		<tr><td>Confirm Group Password: </td><td><input type='password' maxlength='16' name='gpassword2' id='pw2' required></td></tr>
 	</tbody>
 	<tfoot>
 		<tr><td><input type='submit' value='Create Group'></td></tr>
 	</tfoot>
 </table>
-</form><br><br>
+</form>
 
 </body>
 </html>
+<br>
+<br>
 </div>
-
 _END;
 ?>

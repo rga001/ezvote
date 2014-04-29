@@ -282,10 +282,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit']))
 	}
 }
 echo <<<_END
+<div class="formstyle" >
 <body onload="numRows('3')">
 
 <!-- Title and Error -->
-<h1>Create Poll</h1>
+<h1 class="heading">Create Poll</h1>
 <span class='error'>$error</span>
 
 <!-- Start Poll Creation Form -->
@@ -314,15 +315,15 @@ echo <<<_END
 <br><input type='checkbox' name='anonymous' value='yes' $anon_checked> Anonymous voting<br>
 <input type='checkbox' name='comments_disabled' value='yes' $cd_checked> Comments disabled<br>
 
-<!--End date -->
+<!--End date --><br>
 End Date: <input type="text" name='date' id="datepicker" value='$date' required><br><br>
 
 <!-- Title -->
 Title <input type='text' maxlength='30' name='poll_title' value='$poll_title' required><br>
 
-<!-- Description -->
+<!-- Description --><br>
 Description:<br><textarea name='description' maxlength='300'>$description</textarea>
-		
+
 <!-- Choices -->
 <table id='Choices'>
 <thead><tr><th>Choices</th></tr></thead>
@@ -335,7 +336,7 @@ if(empty($choices) || sizeof($choices) == 1)	//default blank choices field or on
 	else
 		echo "<tr><td><input type='text' maxlength='30' name='choices[]'></td>";
 	echo     "<td><input type='button' value='Delete' class='DeleteChoice'></td></tr>";
-	echo "<tr><td><input type='text' maxlenght='30' name='choices[]'></td>";
+	echo 	 "<tr><td><input type='text' maxlenght='30' name='choices[]'></td>";
 	echo     "<td><input type='button' value='Delete' class='DeleteChoice'></td></tr>";
 }
 else //choices already has more than one input
@@ -367,7 +368,9 @@ echo <<<_END
 <form action='index.php'>
 <input type='submit' value='Cancel'>
 </form>
-
+<br>
+<br>
+</div>
 _END;
 
 ?>

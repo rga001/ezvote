@@ -13,7 +13,16 @@ mysql_select_db($dbname) or die(mysql_error());
 //function to query MySQL or show error
 function queryMysql($query)
 {
-	$result = mysql_query($query) or die(mysql_error());
+	//echo $query;
+	try{
+		$result = mysql_query($query) or die(mysql_error());
+	}
+	catch (Exception $e) {
+		//writes to log file
+		$result = '';
+		$log = date("Y-m-d") . "<br>" . $e->getMessage() . "<br>";
+		error_log($log, 3, "/var/www/query-err.log");
+	}
 	return $result;
 }
 

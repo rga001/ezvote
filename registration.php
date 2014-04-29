@@ -97,7 +97,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['registration']))
 //sign up form
 echo <<<_END
 <div class="formstyle">
-<h1 class="heading">Registration</h1><span class='error'>$error</span>
+<h1>Registration</h1><span class='error'>$error</span>
 
 <form method='post' action='registration.php'>
 <table>
@@ -113,10 +113,12 @@ echo <<<_END
 		<tr><td><input type='submit' name='registration' value='Create Account'></td></tr>
 	</tfoot>
 </table>
-</form><br><br>
+</form>
 
 </body>
 </html>
+<br>
+<br>
 </div>
 _END;
 
