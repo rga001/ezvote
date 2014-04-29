@@ -11,6 +11,12 @@ body{margin:0;
 	 background-size:17%;
 	 background-position:0px 55px;}
 
+/*changing normal link colors*/
+a:link {color:white;}
+a:visited {color:white;}
+a:hover {color:#0099CC;}
+a:active {color:#0099CC;}
+
 /*Sets the style for the links both before and after they have been visited in the header*/							  
 a.linky:link, a.linky:visited{text-decoration: none; 
 																  display: inline-block; 
