@@ -250,6 +250,13 @@ class PollModel{
 		$query = "SELECT type FROM extreme_voting.poll_type WHERE type_id = $type_id";
 		return queryMysql($query);
 	}
+	
+	//return search query
+	public function returnSearch($search)
+	{
+		$query = "SELECT * FROM poll_info WHERE title LIKE '%$search%' OR description LIKE '%$search%' ORDER BY create_date DESC";
+		return queryMysql($query);
+	}
 }
 
 ?>

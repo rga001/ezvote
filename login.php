@@ -41,7 +41,7 @@ if(!($userModel->userIsLoggedIn()))
 		<table id='login'>
 			<tbody>
 				<tr><td>Username</td><td>Password</td></tr>
-				<td><input type='text' maxlength='254' name='username1' value='$username' required></td>
+				<tr><td><input type='text' maxlength='254' name='username1' value='$username' required></td>
 				<td><input type='password' maxlength='16' name='password1' required></td>
 				<td><input type='submit' name='login' value='Log In'></td></tr>
 			</tbody>

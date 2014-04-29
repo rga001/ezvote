@@ -46,7 +46,7 @@ if(($_SERVER['REQUEST_METHOD'] == 'GET'))
 
 
 		echo "<div style='width:65%; background: #2D3232; margin-left: 300px; margin-right: auto; margin-top: 200px; padding-top: 20px; border-radius: 10px'>";
-		echo "<div style='padding-bottom:1em;width:75%;margin: 0 auto;'><h1>My Polls</h1></div>";
+		echo "<div style='padding-bottom:1em;width:75%;margin: 0 auto;'><h1>My Polls</h1>";
 		
 
 
@@ -81,7 +81,8 @@ if(($_SERVER['REQUEST_METHOD'] == 'GET'))
 			$cntr++;
 		} 
 
-		$userPolls = queryMysql("SELECT * FROM poll_info WHERE creator_id='$userID'");
+		echo "</div>";
+		$userPolls = queryMysql("SELECT * FROM poll_info WHERE creator_id='$userID' ORDER BY create_date DESC");
 		while ($row = mysql_fetch_array($userPolls)){  
 
 		$tmpRow = $userModel->getUserInfo($row['creator_id']);

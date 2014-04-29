@@ -11,6 +11,10 @@ $poll = mysql_fetch_array($poll_info);
 //grab user id
 $userModel = new UserModel();
 $user_id = $_SESSION['userid'];
+if($userModel->userIsLoggedIn())
+	$user_id = $_SESSION['userid'];
+else
+	$user_id = -1;
 
 //redirect to index.php if poll is private and user is not logged in or if user is not in poll group
 if(!($userModel->userPermissionPoll($poll_id, $user_id)))

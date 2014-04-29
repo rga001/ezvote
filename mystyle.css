@@ -61,6 +61,10 @@ a.sortLink{text-decoration: none;
 	   padding-right: 10px;
 	   border-collapse: collapse;}
 
+#searchTable{position:fixed;
+			 top:160px;
+			 left:11px;}
+
 /*Ads padding between the "username", "password", and login button*/
 #login td{padding-right: 5px;}
 
@@ -90,41 +94,6 @@ a.sortLink{text-decoration: none;
 		 margin-left: 0px;}
 		 
 .checkFilters{color:#0099CC;}
-		 
-#listTable
-{
-	display:table;
-	width:75%;margin-left:auto;
-	margin-right:auto;
-	border-radius: 5px;
-	background-color: white;
-}
-
-#list2
-{
-	display:table-row;
-	background-color: #0099CC;
-}
-
-#list3
-{
-	display:table-cell;
-	padding-top: 1em; 
-	padding-left: 1em; 
-	font-size:large;
-}
-
-#list4
-{
-	float:left;
-	width:50%;
-}
-
-#list5
-{
-	float:left;
-	width:50%;
-}
 
 .ascImg
 {

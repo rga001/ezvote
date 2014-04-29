@@ -181,7 +181,7 @@ _END;
 				<!-- ><div style="padding-left:1em">
 					<label>Voting is set to <?=$tmpType['type']?></label>
 				</div>-->
-			<?if ($row['public'] == 0){?>
+			<? if ($row['public'] == 0){?>
 				<div style="padding-left:1em">
 					<label>This poll is private</label>
 				</div>

@@ -65,5 +65,6 @@ _END;
 }
 
 include_once 'login.php';
+include_once 'search.php';
 echo "<br>";
 ?>
