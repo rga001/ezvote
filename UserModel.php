@@ -63,6 +63,16 @@ class UserModel{
 		return queryMysql($query);
 	}
 	
+	//check if user is in group
+	public function userInGroup($userid, $groupid)
+	{
+		$query = "SELECT * FROM group_members WHERE group_id=$groupid AND member_id=$userid";
+		if (mysql_num_rows(queryMysql($query)) == 0)
+			return false;
+		else
+			return true;
+	}
+	
 	//find out if user is allowed to see poll
 	public function userPermissionPoll($poll_id, $user_id)
 	{

@@ -85,6 +85,8 @@ echo "<div style='padding-bottom:1em;width:75%;margin: 0 auto;'><h1>$grp</h1></d
 $getID= queryMysql("SELECT group_id FROM groups WHERE name='$grp'");
 while ($r = mysql_fetch_array($getID)){
 	$gID = $r['group_id'];
+	if(!($userModel->userInGroup($userID, $gID)))
+		die('<meta http-equiv="REFRESH" content="0; url=index.php">');
 }
 	
 	//get pollids from group_polls
