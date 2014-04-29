@@ -6,13 +6,27 @@ $pollModel = new PollModel();
 
 $userID = $_SESSION['userid'];
 $name = $_SESSION['name'];
-$userGroupIDs = Array();
+$userGroups = Array();
 $userGroupNames = Array();
-$pollClosed = FALSE;
+?>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('.extraInfo').css('height', $('.extraInfo').height());
+		$('.extraInfo').hide();
+		$('.expand').click(function(){
+			var id = $(this).attr("id");
+			if ($("#poll"+id).is(':visible')){
+				$("#poll"+id).hide();
+			}else{
+				$("#poll"+id).css("height","");
+				$("#poll"+id).show();
+			}
+		});
+	});
+</script>
 
-
-//echo $poll;
-/*if(($_SERVER['REQUEST_METHOD'] == 'GET'))
+<?php
+if(($_SERVER['REQUEST_METHOD'] == 'GET'))
 {
 	//get time and date
 	$time = date("Y\-m\-d h:i:s A");
@@ -26,45 +40,64 @@ $pollClosed = FALSE;
 
 }
 
-$groups = queryMysql("SELECT group_id FROM group_members WHERE member_id='$userid'");
-$cntr = 0;
-while($row = mysql_fetch_array($groups)){
-	$userGroups[$cntr] = $row['group_id'];
-	$cntr++;
-}
-
-foreach($userGroups as $y)
-{
-	echo $userGroups[$x];
-	$grp = queryMysql("SELECT name FROM groups WHERE group_id='$userGroups[$y]'");
-	while($row = mysql_fetch_array($grp))
-	{
-		$userGroupNames[$y] = $row['name'];
-	}
-}	
-
-//display links to group pages
-echo "groups: ";
-foreach($userGroups as $z) 
-{
-	//echo $userGroupNames[$z] . " ";
-	echo "<a href=GroupPolls.php?group={$userGroupNames[$z]}>{$userGroupNames[$z]}</a>" . " ";
-} 
-
- */echo "hi";
 
 		echo "<div style='width:65%; background: #2D3232; margin-left: 300px; margin-right: auto; margin-top: 200px; padding-top: 20px; border-radius: 10px'>";
+		echo "<div style='padding-bottom:1em;width:75%;margin: 0 auto;'><h1>My Polls</h1></div>";
+		
+
+
+		$groups = queryMysql("SELECT group_id FROM group_members WHERE member_id='$userID'");
+		$cntr = 0;
+		while($row = mysql_fetch_array($groups)){
+			$userGroups[$cntr] = $row['group_id'];
+			//echo $userGroups[$cntr]." ";
+			$cntr++;
+		}
+		$cntr = 0;
+		foreach($userGroups as $y)
+		{	
+			$grp = queryMysql("SELECT name FROM groups WHERE group_id='$userGroups[$cntr]'");
+			while($row = mysql_fetch_array($grp))
+			{	
+				$userGroupNames[$cntr] = $row['name'];
+				//echo $userGroupNames[$cntr];
+
+			}
+			$cntr++;
+		}	
+
+		
+		//display links to group pages
+		$cntr = 0;
+		echo "groups: ";
+		foreach($userGroupNames as $z) 
+		{
+			//echo $userGroupNames[$z];
+			echo "<a href=GroupPolls.php?group={$userGroupNames[$cntr]}>{$userGroupNames[$cntr]}</a>" . " ";
+			$cntr++;
+		} 
+
 		$userPolls = queryMysql("SELECT * FROM poll_info WHERE creator_id='$userID'");
-		echo "<h1 style='padding-left:80px;'> Polls </h1>";
 		while ($row = mysql_fetch_array($userPolls)){  
 
-
+		$tmpRow = $userModel->getUserInfo($row['creator_id']);
+		$tmpCreator = mysql_fetch_array($tmpRow);
+		
+		$end_date = substr($row['end_date'], 0, -9);
+		$tmp_end_date = explode('-', $end_date);
+		$end_date = $tmp_end_date[1] . "/" . $tmp_end_date[2] . "/" . $tmp_end_date[0];
+		
+		$start_date = substr($row['create_date'], 0, -9);
+		$tmp_start_date = explode('-', $start_date);
+		$start_date = $tmp_start_date[1] . "/" . $tmp_start_date[2] . "/" . $tmp_start_date[0];
+		
+		$creator = $tmpCreator['firstname'].' '.$tmpCreator['lastname'];
 		?>
 		
 <!--<div style="background-color: #2D3232; padding-top: 20px; margin-top: 150px; margin-left: 250px; width: 800px; border-radius: 10px">-->
-<div style="display:table;width:80%; margin-left: auto; margin-right:auto; border-radius: 5px; background-color: white;">
-			<div style="display:table-row; background-color: #0099CC;">
-				<div style="display:table-cell; padding-top: 1em; padding-left: 1em; font-size:large;">
+		<div style="display:table;width:75%;margin-left:auto; margin-right:auto; border: 2px solid gray; border-radius: 5px; background-color:white;">
+			<div style="display:table-row; background-color: lightblue;">
+				<div style="display:table-cell; padding-top: 1em; padding-left: 1em; font-size:large; ">
 				    <a href="/viewpoll.php?pollid=<?= $row['poll_id']?>"><?= $row['title']?></a>
 				</div>
 				<div style="display:table-cell"></div>
@@ -77,20 +110,40 @@ foreach($userGroups as $z)
 				<div style="float:left;width:50%;">
 
 				<? if($pollModel->validPollDate($row['poll_id'])){ ?>
-					<label style="cursor:pointer;">Poll closes at: <?= $row['end_date'] ?></label>		
+					<label style="cursor:pointer;">Poll closes at: <?= $end_date ?></label>		
 					<form method="get" action="UserPolls.php">
 						<input type="submit" value="Close Poll"> 
 						<input type="hidden" name="pollid" value="<?echo $row['poll_id']?>">
 					</form>	
 				<? }	
 				   else{	?>
-				     <label style="cursor:pointer;">Poll closed: <?= $row['end_date'] ?></label>
+				     <label style="cursor:pointer;">Poll closed: <?= $end_date ?></label>
 				 <?}?>	
 				</div>
 			
 			</div>
-			<div id="poll<?=$row['poll_id'] ?>" style="display:none;width:200px" class="extraInfo">
-				<label>Creator: <?=$_SESSION['name']?></label>
+			<div id="poll<?=$row['poll_id'] ?>" style="display:none;height:auto;overflow:auto;" class="extraInfo">
+				<div style="padding-top:.5em;padding-left:1em;">
+					<label>Creator: <?=$creator ?></label>
+				</div>
+				<div style="padding-left:1em">
+					<label>Poll Start: <?=$start_date?></label>
+				</div>
+				<!-- ><div style="padding-left:1em">
+					<label>Voting is set to <?=$tmpType['type']?></label>
+				</div>-->
+			<?if ($row['public'] == 0){?>
+				<div style="padding-left:1em">
+					<label>This poll is private</label>
+				</div>
+			<?}if ($row['comments'] == 0){?>
+				<div style="padding-left:1em">
+					<label>Comments are disabled.</label>
+				</div>
+			<?}if ($row['anonymous'] == 1){?>
+				<div style="padding-left:1em">
+					<label>Voting is anonymous</label>
+				</div><?}?>				
 			</div>
 		</div>
 		<br />
